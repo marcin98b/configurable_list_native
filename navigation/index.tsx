@@ -14,8 +14,9 @@ import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import TabOneScreen from '../screens/TabOneScreen';
-import TabTwoScreen from '../screens/TabTwoScreen';
+import TabListScreen from '../screens/TabListScreen';
+import TabShopScreen from '../screens/TabShopScreen';
+import TabCustomProductScreen from '../screens/TabCustomProductScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
@@ -58,16 +59,16 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="TabList"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}>
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        name="TabList"
+        component={TabListScreen}
+        options={({ navigation }: RootTabScreenProps<'TabList'>) => ({
+          title: 'Twoje Listy',
+          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
           headerRight: () => (
             <Pressable
               onPress={() => navigation.navigate('Modal')}
@@ -85,11 +86,19 @@ function BottomTabNavigator() {
         })}
       />
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
+        name="TabShop"
+        component={TabShopScreen}
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Sklepy',
+          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-bag" color={color} />,
+        }}
+      />
+            <BottomTab.Screen
+        name="TabCustomProduct"
+        component={TabCustomProductScreen}
+        options={{
+          title: 'Produkty',
+          tabBarIcon: ({ color }) => <TabBarIcon name="archive" color={color} />,
         }}
       />
     </BottomTab.Navigator>
