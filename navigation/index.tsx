@@ -7,12 +7,15 @@ import { FontAwesome } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import * as React from 'react';
 import { ColorSchemeName, Pressable } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import TabListScreen from '../screens/TabListScreen';
 import TabShopScreen from '../screens/TabShopScreen';
@@ -20,11 +23,15 @@ import TabCustomProductScreen from '../screens/TabCustomProductScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 
+import {getToken} from "../api/env";
+
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+
+
       <RootNavigator />
     </NavigationContainer>
   );
@@ -37,13 +44,20 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
+
+
+
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
+
+     <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+     <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
+     <Stack.Screen name="Register" options={{title: 'Rejestracja'}} component={RegisterScreen} />  
+    <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+    <Stack.Group screenOptions={{ presentation: 'modal' }}>
+    <Stack.Screen name="Modal" component={ModalScreen} />
+    </Stack.Group>
+
     </Stack.Navigator>
   );
 }
@@ -57,7 +71,10 @@ const BottomTab = createBottomTabNavigator<RootTabParamList>();
 function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
+
   return (
+
+    
     <BottomTab.Navigator
       initialRouteName="TabList"
       screenOptions={{
@@ -104,6 +121,14 @@ function BottomTabNavigator() {
     </BottomTab.Navigator>
   );
 }
+
+
+const Drawer = createDrawerNavigator();
+
+
+
+
+
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/

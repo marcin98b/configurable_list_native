@@ -15,6 +15,7 @@ const linking: LinkingOptions<RootStackParamList> = {
     screens: {
       Root: {
         screens: {
+
           TabList: {
             screens: {
               TabListScreen: 'TabList',
@@ -38,6 +39,8 @@ const linking: LinkingOptions<RootStackParamList> = {
       },
       Modal: 'modal',
       NotFound: '*',
+      Register:'register',
+      Login:'login'
     },
   },
 };

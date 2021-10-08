@@ -1,53 +1,75 @@
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity, Button } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
-import api from '../api.json';
+import {API_URL, getToken, setToken} from "../api/env";
 
 //network
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList } from 'react-native';
+import { NavigationHelpersContext } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TabListScreen({ navigation }: RootTabScreenProps<'TabList'>) {
  
+
+  const LogOut = async () => {
+
+  try {
+    await AsyncStorage.removeItem('@token').then(
+      res =>
+      {
+        navigation.navigate('Login');
+      }
+    );
+
+  }
+  catch(exception) {
+    return false;
+}
+  }
+
+
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
- 
-  const getLists = async () => {
-    try {
 
-    const urlencoded = new URLSearchParams();  
-    const options = {
-      method: 'GET',
-      //body: urlencoded,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept':'application/json',
-        'Authorization': 'Bearer '+api.KEY
+
+//   const getLists = async () => {
+//     try {
+
+//     const token = await getToken();
+//     const urlencoded = new URLSearchParams();  
+//     const options = {
+//       method: 'GET',
+//       //body: urlencoded,
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Accept':'application/json',
+//         'Authorization': 'Bearer '+token
         
-      },
+//       },
 
-    }
+//     }
 
-     const response = await fetch('https://listak.pl/api/lists', options);
-     const json = await response.json();
-     setData(json);
-   } catch (error) {
-     console.error(error);
-   } finally {
-     setLoading(false);
-   }
- }
+//      const response = await fetch(API_URL + '/lists', options);
+//      const json = await response.json();
+//      setData(json);
+//    } catch (error) {
+//      console.error(error);
+//    } finally {
+//      setLoading(false);
+//    }
+//  }
 
- useEffect(() => {
-   getLists();
- }, []);
+//  useEffect(() => {
+//    getLists();
+//  }, []);
 
  
   return (
     <View style={styles.container}>
 
-      {isLoading ? <ActivityIndicator/> : (
+      {/* {isLoading ? <ActivityIndicator/> : (
         <FlatList
           data={data}
           keyExtractor={({ id }, index) => id}
@@ -58,9 +80,14 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
           )}
           ListEmptyComponent={<Text>Brak list!</Text>}
         />
-      )}
+      )}  */}
 
+            <TouchableOpacity
+            onPress={() => LogOut()}
+            >
+              <Text>Wyloguj</Text>
 
+            </TouchableOpacity>
     </View>
   );
 }
