@@ -10,26 +10,9 @@ import { ActivityIndicator, FlatList } from 'react-native';
 import { NavigationHelpersContext } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function TabListScreen({ navigation }: RootTabScreenProps<'TabList'>) {
+export default function GetListScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
  
-
-  const LogOut = async () => {
-
-  try {
-    await AsyncStorage.removeItem('@token').then(
-      res =>
-      {
-        navigation.navigate('Login');
-      }
-    );
-
-  }
-  catch(exception) {
-    return false;
-}
-  }
-
-
+  const {listId}  = route.params;
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
@@ -51,7 +34,7 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
 
     }
 
-     const response = await fetch(API_URL + '/lists', options);
+     const response = await fetch(API_URL + '/lists/' + listId + '/products', options);
      const json = await response.json();
      setData(json);
    } catch (error) {
@@ -70,7 +53,7 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
 
  const Item = ({ id,title }) => (
   <TouchableOpacity
-  onPress={() => navigation.navigate('GetList', {listId: id, name:title})}
+  onPress={() => navigation.navigate('NotFound')}
   >
   <View style={styles.item}>
     <Text style={styles.title}>{title}</Text>
@@ -99,16 +82,11 @@ const renderItem = ({ item }) => (
           //   <Text>{item.name},  {item.created_at}</Text>
 
           // )}
-          ListEmptyComponent={<Text>Brak list!</Text>}
+          ListEmptyComponent={<Text>Brak produktow!</Text>}
         />
       )} 
 
-            <TouchableOpacity
-            onPress={() => LogOut()}
-            >
-              <Text>Wyloguj</Text>
 
-            </TouchableOpacity>
     </View>
   );
 }

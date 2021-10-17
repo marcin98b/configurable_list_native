@@ -18,7 +18,9 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import TabListScreen from '../screens/TabListScreen';
+import GetListScreen from '../screens/GetListScreen';
 import TabShopScreen from '../screens/TabShopScreen';
+
 import TabCustomProductScreen from '../screens/TabCustomProductScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -49,10 +51,10 @@ function RootNavigator() {
 
   return (
     <Stack.Navigator>
-
-     <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
      <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
      <Stack.Screen name="Register" options={{title: 'Rejestracja'}} component={RegisterScreen} />  
+     <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+     <Stack.Screen name="GetList" options={({ route }) => ({ title: route.params.name })} component={GetListScreen} />       
     <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
     <Stack.Group screenOptions={{ presentation: 'modal' }}>
     <Stack.Screen name="Modal" component={ModalScreen} />
@@ -88,7 +90,7 @@ function BottomTabNavigator() {
           tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
           headerRight: () => (
             <Pressable
-              onPress={() => navigation.navigate('Modal')}
+              onPress={() => navigation.navigate('TabShop')}
               style={({ pressed }) => ({
                 opacity: pressed ? 0.5 : 1,
               })}>
