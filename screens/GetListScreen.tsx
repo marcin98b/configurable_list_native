@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, Button } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import {API_URL, getToken, setToken} from "../api/env";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 //network
 import { useEffect, useState } from 'react';
@@ -17,7 +18,7 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
   const [data, setData] = useState([]);
 
 
-  const getLists = async () => {
+  const getProducts = async () => {
     try {
 
     const token = await getToken();
@@ -44,25 +45,71 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
    }
  }
 
+ const TickProduct = async (product_id, tickState) => {
+  try {
+
+    const token = await getToken();
+    const urlencoded = new URLSearchParams();  
+    const options = {
+      method: 'PUT',
+      body: JSON.stringify({
+        ticked: !tickState
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept':'application/json',
+        'Authorization': 'Bearer '+token
+        
+      },
+
+    }
+
+     const response = await fetch(API_URL + '/lists/' + listId + '/products/' + product_id, options);
+   } catch (error) {
+     console.error(error);
+
+  
+ }
+
+}
+
+
  useEffect(() => {
-   getLists();
+   getProducts();
  }, []);
 
 
  //Komponent listy
 
- const Item = ({ id,title }) => (
-  <TouchableOpacity
-  onPress={() => navigation.navigate('NotFound')}
-  >
-  <View style={styles.item}>
-    <Text style={styles.title}>{title}</Text>
+ const Item = ({ id,title, ticked}) => (
+
+    
+
+
+  <View style={[styles.item, {
+    flexDirection: "row"
+  }]}>
+
+    <BouncyCheckbox
+      size={30}
+      fillColor="blue"
+      isChecked={ticked}
+      unfillColor="#FFFFFF"
+      iconStyle={{ borderColor: "white" }}
+      onPress={() => {TickProduct(id, ticked); ticked = !ticked }}
+    />
+
+        <Text style={styles.title}>{title}</Text>
+
+
   </View>
-  </TouchableOpacity>
+
 );
 
 const renderItem = ({ item }) => (
-  <Item title={item.name} id={item.id} />
+  <Item title={item.name}
+        id={item.id} 
+        ticked={item.ticked} />
 );
 
 
@@ -108,7 +155,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   item: {
-    backgroundColor: '#b3ffb3',
+    backgroundColor: '#e6e6ff',
     padding: 20,
     marginVertical: 4,
     borderRadius: 10
