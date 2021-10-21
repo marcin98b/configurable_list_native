@@ -19,7 +19,7 @@ export type RootStackParamList = {
   NotFound: undefined;
   Register:undefined;
   Login:undefined;
-  GetList:undefined;
+  GetList:{listId:number, name:string};
 
 };
 

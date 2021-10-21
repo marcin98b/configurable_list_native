@@ -13,7 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function GetListScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
  
-  const {listId}  = route.params;
+  const {listId}:any  = route.params;
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
@@ -83,8 +83,6 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
 
  const Item = ({ id,title, ticked}) => (
 
-    
-
 
   <View style={[styles.item, {
     flexDirection: "row"
@@ -121,21 +119,17 @@ const renderItem = ({ item }) => (
           data={data}
           renderItem={renderItem}
           keyExtractor={item => item.id}
-
-          // data={data}
-          // keyExtractor={item => item.id}
-          // renderItem={({ item }) => (
-
-          //   <Text>{item.name},  {item.created_at}</Text>
-
-          // )}
           ListEmptyComponent={<Text>Brak produktow!</Text>}
         />
       )} 
 
-
     </View>
+
+
+
   );
+
+  
 }
 
 const styles = StyleSheet.create({

@@ -88,20 +88,20 @@ function BottomTabNavigator() {
         options={({ navigation }: RootTabScreenProps<'TabList'>) => ({
           title: 'Twoje Listy',
           tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate('TabShop')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),
+          // headerRight: () => (
+          //   <Pressable
+          //     onPress={() => navigation.navigate('TabShop')}
+          //     style={({ pressed }) => ({
+          //       opacity: pressed ? 0.5 : 1,
+          //     })}>
+          //     <FontAwesome
+          //       name="info-circle"
+          //       size={25}
+          //       color={Colors[colorScheme].text}
+          //       style={{ marginRight: 15 }}
+          //     />
+          //   </Pressable>
+          // ),
         })}
       />
       <BottomTab.Screen

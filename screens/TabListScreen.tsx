@@ -1,17 +1,18 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity, Button } from 'react-native';
+import {useRef} from 'react';
+import { StyleSheet, TouchableOpacity, TextInput, Alert, Button} from 'react-native';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import {API_URL, getToken, setToken} from "../api/env";
-
+import { FontAwesome } from '@expo/vector-icons';
 //network
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList } from 'react-native';
-import { NavigationHelpersContext } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function TabListScreen({ navigation }: RootTabScreenProps<'TabList'>) {
  
+  const [listName, setName] = useState('');
 
   const LogOut = async () => {
 
@@ -29,7 +30,7 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
 }
   }
 
-
+  const flatlistRef = useRef();
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
@@ -61,6 +62,61 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
    }
  }
 
+ const AddList = async (listName) => {
+  try {
+
+  const token = await getToken();
+  const options = {
+    method: 'POST',
+    body: JSON.stringify({
+      name:listName
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept':'application/json',
+      'Authorization': 'Bearer '+token
+      
+    },
+
+  }
+
+   const response = await fetch(API_URL + '/lists/create', options);
+ } catch (error) {
+   console.error(error);
+ } finally {
+   getLists();
+   flatlistRef.current.scrollToEnd({animating: true});
+   setLoading(false);
+ }
+}
+
+const DeleteList = async (listId) => {
+  try {
+
+  const token = await getToken();
+  const options = {
+    method: 'DELETE',
+    body: ({
+      id:listId
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept':'application/json',
+      'Authorization': 'Bearer '+token
+      
+    },
+
+  }
+
+   const response = await fetch(API_URL + '/lists/'+listId, options);
+ } catch (error) {
+   console.error(error);
+ } finally {
+   getLists();
+   setLoading(false);
+ }
+}
+
  useEffect(() => {
    getLists();
  }, []);
@@ -74,6 +130,27 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
   >
   <View style={styles.item}>
     <Text style={styles.title}>{title}</Text>
+
+    <TouchableOpacity
+      onPress={() => {
+        
+        Alert.alert('Usunięcie listy', 'Potwierdź usunięcie listy: "' +title+'".',
+        [
+          {
+            text: "Usuń",
+            onPress: () => DeleteList(id)
+          },
+          { text: "Anuluj", onPress: () => console.log('Anulowano')}
+        ]
+        )
+        
+        }}   
+      style={styles.ButtonDelete}
+   
+      >
+      <FontAwesome name="remove" size={32} color="red" />
+
+      </TouchableOpacity>
   </View>
   </TouchableOpacity>
 );
@@ -88,10 +165,11 @@ const renderItem = ({ item }) => (
 
       {isLoading ? <ActivityIndicator/> : (
         <FlatList
+          ref={flatlistRef}
           data={data}
           renderItem={renderItem}
           keyExtractor={item => item.id}
-
+          extraData={listName}
           // data={data}
           // keyExtractor={item => item.id}
           // renderItem={({ item }) => (
@@ -103,13 +181,30 @@ const renderItem = ({ item }) => (
         />
       )} 
 
-            <TouchableOpacity
-            onPress={() => LogOut()}
-            >
-              <Text>Wyloguj</Text>
+<View style={styles.addPanel}>
+<TextInput
+        style={styles.addInput}
+        placeholder="Dodaj produkt ..."
+        onChangeText={listName => setName(listName)}
+        defaultValue={listName}       
+ />
+      <TouchableOpacity
+      disabled = { listName ? '' : true }
+      onPress={() => {AddList(listName); setName('');}}   
+      style={styles.ButtonAdd}
+   
 
-            </TouchableOpacity>
+      >
+      <FontAwesome name="plus-circle" size={55} color="green" />
+
+      </TouchableOpacity>
+ </View>
+
+
+
+
     </View>
+    
   );
 }
 
@@ -121,6 +216,7 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
   },
   title: {
+    flex:6,
     fontSize: 20,
     fontWeight: 'bold',
   },
@@ -133,7 +229,34 @@ const styles = StyleSheet.create({
     backgroundColor: '#b3ffb3',
     padding: 20,
     marginVertical: 4,
-    borderRadius: 10
+    borderRadius: 10,
+    flexDirection:"row"
   
-  }
+  },
+  addInput: {
+    backgroundColor: "#f2f2f2",
+    width: "90%",
+    borderRadius:20,
+    borderWidth:1,
+    borderColor:"#d9d9d9",
+    height:35,
+   
+
+  },
+  ButtonAdd: {
+
+    marginLeft:5,
+
+  },
+  ButtonDelete:{
+    flex:0
+    
+
+  },
+  addPanel: {
+    flexDirection:"row",
+    padding: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

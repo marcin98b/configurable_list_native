@@ -52,7 +52,7 @@ if(login && password) {
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-     
+      
      <Text style={styles.Listak_header}>Listak</Text>
 
      <Text >E-mail:</Text>
