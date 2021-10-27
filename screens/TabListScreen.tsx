@@ -5,6 +5,8 @@ import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import {API_URL, getToken, setToken} from "../api/env";
 import { FontAwesome } from '@expo/vector-icons';
+import {Keyboard} from 'react-native'
+
 //network
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList } from 'react-native';
@@ -34,7 +36,7 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
-
+//FUNKCJA WCZYTUJĄCA LISTY
   const getLists = async () => {
     try {
 
@@ -62,6 +64,8 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
    }
  }
 
+
+//FUNKCJA DODAJĄCA NOWĄ LISTĘ
  const AddList = async (listName) => {
   try {
 
@@ -85,11 +89,11 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
    console.error(error);
  } finally {
    getLists();
-   flatlistRef.current.scrollToEnd({animating: true});
    setLoading(false);
  }
 }
 
+//FUNKCJA USUWAJĄCĄ LISTĘ O DANYM ID
 const DeleteList = async (listId) => {
   try {
 
@@ -117,13 +121,39 @@ const DeleteList = async (listId) => {
  }
 }
 
+//FUNKCJA DUPLIKUJĄCĄ LISTĘ O DANYM ID
+const DuplicateList = async (listId) => {
+  try {
+
+  const token = await getToken();
+  const options = {
+    method: 'POST',
+    // body: 
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept':'application/json',
+      'Authorization': 'Bearer '+token
+      
+    },
+
+  }
+
+   const response = await fetch(API_URL + '/lists/'+ listId + '/duplicate', options);
+ } catch (error) {
+   console.error(error);
+ } finally {
+   getLists();
+   setLoading(false);
+ }
+}
+
  useEffect(() => {
    getLists();
  }, []);
 
 
- //Komponent listy
 
+ //GRAFICZNY KOMPONENT LISTY
  const Item = ({ id,title }) => (
   <TouchableOpacity
   onPress={() => navigation.navigate('GetList', {listId: id, name:title})}
@@ -131,7 +161,43 @@ const DeleteList = async (listId) => {
   <View style={styles.item}>
     <Text style={styles.title}>{title}</Text>
 
+
+{/* BUTTON DUPLICATE */}
+<TouchableOpacity
+      onPress={() => {
+      
+        Alert.alert('Duplikacja listy', 'Czy chcesz zduplikować listę: "' +title+'".',
+        [
+          {
+            text: "Tak",
+            onPress: () => DuplicateList(id)
+          },
+          { text: "Nie", onPress: () => console.log('Anulowano')}
+        ]
+        )
+
+        }}   
+      style={styles.ButtonDuplicate}
+   
+      >
+      <FontAwesome name="files-o" size={28} color="green" />
+
+      </TouchableOpacity>
+
+
+{/* BUTTON EDIT */}
     <TouchableOpacity
+      onPress={() => {
+
+        }}   
+      style={styles.ButtonEdit}
+   
+      >
+      <FontAwesome name="edit" size={32} color="orange" />
+
+      </TouchableOpacity>
+{/* BUTTON DELETE */}
+      <TouchableOpacity
       onPress={() => {
         
         Alert.alert('Usunięcie listy', 'Potwierdź usunięcie listy: "' +title+'".',
@@ -155,13 +221,42 @@ const DeleteList = async (listId) => {
   </TouchableOpacity>
 );
 
+
+
+//RENDER
 const renderItem = ({ item }) => (
   <Item title={item.name} id={item.id} />
 );
 
-
+//VIEW
   return (
     <View style={styles.container}>
+
+
+<View style={styles.addPanel}>
+<TextInput
+        style={styles.addInput}
+        placeholder="Dodaj listę ..."
+        onChangeText={listName => setName(listName)}
+        defaultValue={listName}       
+ />
+      <TouchableOpacity
+      disabled = { listName ? '' : true }
+      onPress={() => {
+        AddList(listName); 
+        setName('');
+        Keyboard.dismiss();
+      }}   
+      style={styles.ButtonAdd}
+   
+
+      >
+      <FontAwesome name="plus-circle" size={55} color={listName ? "green" : "gray"} />
+
+      </TouchableOpacity>
+ </View>
+
+
 
       {isLoading ? <ActivityIndicator/> : (
         <FlatList
@@ -181,24 +276,6 @@ const renderItem = ({ item }) => (
         />
       )} 
 
-<View style={styles.addPanel}>
-<TextInput
-        style={styles.addInput}
-        placeholder="Dodaj produkt ..."
-        onChangeText={listName => setName(listName)}
-        defaultValue={listName}       
- />
-      <TouchableOpacity
-      disabled = { listName ? '' : true }
-      onPress={() => {AddList(listName); setName('');}}   
-      style={styles.ButtonAdd}
-   
-
-      >
-      <FontAwesome name="plus-circle" size={55} color="green" />
-
-      </TouchableOpacity>
- </View>
 
 
 
@@ -208,6 +285,7 @@ const renderItem = ({ item }) => (
   );
 }
 
+//STYLE
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -226,36 +304,59 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   item: {
-    backgroundColor: '#b3ffb3',
+    backgroundColor: '#F0F0F0',
     padding: 20,
     marginVertical: 4,
     borderRadius: 10,
+    borderColor: '#CCCCCC',
+    borderWidth: 2,
     flexDirection:"row"
   
   },
   addInput: {
-    backgroundColor: "#f2f2f2",
-    width: "90%",
+    backgroundColor: "#FAFAFA",
+    paddingLeft:15,
+    width: "100%",
     borderRadius:20,
     borderWidth:1,
     borderColor:"#d9d9d9",
-    height:35,
+    height:55,
    
 
   },
   ButtonAdd: {
 
     marginLeft:5,
-
+    position: 'absolute',
+    right: 12,
+    bottom:15
   },
   ButtonDelete:{
+   
     flex:0
+    
+  },
+  ButtonEdit:{
+    
+    paddingRight:5,
+    position:"relative",
+    top:2,
+
+  },
+  ButtonDuplicate:{
+    
+    position:"relative",
+    top:2,
+    paddingRight:8,
     
 
   },
   addPanel: {
     flexDirection:"row",
-    padding: 15,
+    paddingTop:5,
+    paddingBottom:15,
+    paddingLeft:15,
+    paddingRight:15,
     alignItems: 'center',
     justifyContent: 'center',
   },
