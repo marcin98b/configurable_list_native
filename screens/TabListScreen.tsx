@@ -6,6 +6,7 @@ import { RootTabScreenProps } from '../types';
 import {API_URL, getToken, setToken} from "../api/env";
 import { FontAwesome } from '@expo/vector-icons';
 import {Keyboard} from 'react-native'
+import { showMessage, hideMessage } from "react-native-flash-message";
 
 //network
 import { useEffect, useState } from 'react';
@@ -22,7 +23,7 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
     await AsyncStorage.removeItem('@token').then(
       res =>
       {
-        navigation.navigate('Login');
+        navigation.replace('Login');
       }
     );
 
@@ -32,7 +33,7 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
 }
   }
 
-  const flatlistRef = useRef();
+
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
@@ -89,6 +90,11 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
    console.error(error);
  } finally {
    getLists();
+   showMessage({
+    message: 'Pomyślnie dodano listę "'+listName+'"!',
+    type:"success",
+    icon:"success"
+   });
    setLoading(false);
  }
 }
@@ -100,7 +106,7 @@ const DeleteList = async (listId) => {
   const token = await getToken();
   const options = {
     method: 'DELETE',
-    body: ({
+    body: JSON.stringify({
       id:listId
     }),
     headers: {
@@ -117,6 +123,11 @@ const DeleteList = async (listId) => {
    console.error(error);
  } finally {
    getLists();
+   showMessage({
+    message: "Pomyślnie usunięto listę!",
+    type:"info",
+    icon:"success"
+   });
    setLoading(false);
  }
 }
@@ -143,6 +154,11 @@ const DuplicateList = async (listId) => {
    console.error(error);
  } finally {
    getLists();
+   showMessage({
+    message: "Pomyślnie zduplikowano listę!",
+    type:"success",
+    icon:"success"
+   });
    setLoading(false);
  }
 }
@@ -156,7 +172,7 @@ const DuplicateList = async (listId) => {
  //GRAFICZNY KOMPONENT LISTY
  const Item = ({ id,title }) => (
   <TouchableOpacity
-  onPress={() => navigation.navigate('GetList', {listId: id, name:title})}
+  onPress={() => navigation.navigate('GetList', {listId: id.toString(), name:title})}
   >
   <View style={styles.item}>
     <Text style={styles.title}>{title}</Text>
@@ -233,55 +249,70 @@ const renderItem = ({ item }) => (
     <View style={styles.container}>
 
 
-<View style={styles.addPanel}>
-<TextInput
-        style={styles.addInput}
-        placeholder="Dodaj listę ..."
-        onChangeText={listName => setName(listName)}
-        defaultValue={listName}       
- />
-      <TouchableOpacity
-      disabled = { listName ? '' : true }
-      onPress={() => {
-        AddList(listName); 
-        setName('');
-        Keyboard.dismiss();
-      }}   
-      style={styles.ButtonAdd}
-   
+    <View style={styles.addPanel}>
+    <TextInput
+            style={styles.addInput}
+            placeholder="Dodaj listę ..."
+            onChangeText={listName => setName(listName)}
+            defaultValue={listName} 
+            onSubmitEditing= {() => {
+              AddList(listName); 
+              setName('');
+              Keyboard.dismiss();
+              
+            }}        
+    />
+          <TouchableOpacity
+          disabled = { listName ? false : true }
+          onPress={() => {
+            AddList(listName); 
+            setName('');
+            Keyboard.dismiss();
+            
+          }}   
+          style={styles.ButtonAdd}
+      
 
-      >
-      <FontAwesome name="plus-circle" size={55} color={listName ? "green" : "gray"} />
+          >
+          <FontAwesome name="plus-circle" size={55} color={listName ? "green" : "gray"} />
 
-      </TouchableOpacity>
- </View>
+          </TouchableOpacity>
+    </View>
 
 
 
       {isLoading ? <ActivityIndicator/> : (
         <FlatList
-          ref={flatlistRef}
           data={data}
           renderItem={renderItem}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.id.toString()}
           extraData={listName}
-          // data={data}
-          // keyExtractor={item => item.id}
-          // renderItem={({ item }) => (
-
-          //   <Text>{item.name},  {item.created_at}</Text>
-
-          // )}
           ListEmptyComponent={<Text>Brak list!</Text>}
         />
       )} 
 
+<TouchableOpacity
 
+      onPress={() => {
+        LogOut();
+        
+      }}   
+      style={styles.ButtonAdd}
+   
 
+      >
+      <Text>
+          Wyloguj
+      </Text>
+
+      </TouchableOpacity>
 
 
     </View>
     
+
+
+
   );
 }
 

@@ -7,9 +7,7 @@ import { Text, View } from '../components/Themed';
 export default function TabShopScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Twodd</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabShopScreen.tsx" />
+      <Text style={styles.title}>Zakładka Sklepy</Text>
     </View>
   );
 }

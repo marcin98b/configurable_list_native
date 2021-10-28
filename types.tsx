@@ -19,7 +19,17 @@ export type RootStackParamList = {
   NotFound: undefined;
   Register:undefined;
   Login:undefined;
-  GetList:{listId:number, name:string};
+  GetList:{listId:string, name:string};
+
+};
+
+export type DrawerStackParamList = {
+  Root: NavigatorScreenParams<RootTabParamList> | undefined;
+  Modal: undefined;
+  NotFound: undefined;
+  Register:undefined;
+  Login:undefined;
+  GetList:{listId:string, name:string};
 
 };
 
@@ -34,6 +44,8 @@ export type RootTabParamList = {
   TabCustomProduct: undefined;
 
 };
+
+
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
   BottomTabScreenProps<RootTabParamList, Screen>,

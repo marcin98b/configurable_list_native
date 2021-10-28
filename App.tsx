@@ -5,8 +5,8 @@ import { Text, View } from './components/Themed';
 import useCachedResources from './hooks/useCachedResources';
 import useColorScheme from './hooks/useColorScheme';
 import Navigation from './navigation';
+import FlashMessage from "react-native-flash-message";
 
-import api from './api.json';
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -20,8 +20,10 @@ export default function App() {
       <SafeAreaProvider>
         
         <Navigation colorScheme={colorScheme} /> 
-        
+
         <StatusBar />
+        {/* GLOBAL FLASH MESSAGE COMPONENT INSTANCE */}
+        <FlashMessage position="bottom" duration={Number(1000)} floating  /> 
       </SafeAreaProvider>
     );
   }

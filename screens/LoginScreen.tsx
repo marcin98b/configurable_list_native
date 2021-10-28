@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Button, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Button, TouchableOpacity, TextInput, Linking } from 'react-native';
 import { onChange } from 'react-native-reanimated';
 
 import { Text, View } from '../components/Themed';
@@ -25,7 +25,8 @@ const CheckCredentials = () => {
 if(login && password) { 
     const response = {
         "email": login,
-        "password": password
+        "password": password,
+        "token":''
     }
 
     axios.post(API_URL + '/login', response)
@@ -71,6 +72,23 @@ if(login && password) {
         defaultValue={password}    
         secureTextEntry
       />
+
+<TouchableOpacity
+      onPress={() => {Linking.openURL('https://listak.pl/forgot-password')}}
+      style={{
+        position:'relative',
+        right:110,
+        top:10,
+        paddingTop:5,
+      }}
+      >
+        <Text style={{
+          fontWeight:'bold'
+        }}>
+            Nie pamiętasz hasła?
+        </Text>
+
+      </TouchableOpacity>
 
       <TouchableOpacity
       onPress={() => CheckCredentials()}

@@ -9,7 +9,8 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import * as React from 'react';
-import { ColorSchemeName, Pressable } from 'react-native';
+import { ColorSchemeName, Pressable, TouchableOpacity, Text } from 'react-native';
+
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -24,8 +25,8 @@ import TabShopScreen from '../screens/TabShopScreen';
 import TabCustomProductScreen from '../screens/TabCustomProductScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+import { getToken } from '../api/env';
 
-import {getToken} from "../api/env";
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -33,9 +34,9 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
 
-
-      <RootNavigator />
+      <RootNavigator /> 
     </NavigationContainer>
+
   );
 }
 
@@ -54,7 +55,7 @@ function RootNavigator() {
      <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
      <Stack.Screen name="Register" options={{title: 'Rejestracja'}} component={RegisterScreen} />  
      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-     <Stack.Screen name="GetList" options={({ route }) => ({ title: route.params.name })} component={GetListScreen} />       
+     <Stack.Screen name="GetList" options={({ route }) => ({ title: 'Lista: "'+route.params.name+'"' })} component={GetListScreen} />       
     <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
     <Stack.Group screenOptions={{ presentation: 'modal' }}>
     <Stack.Screen name="Modal" component={ModalScreen} />
@@ -125,10 +126,35 @@ function BottomTabNavigator() {
 }
 
 
-const Drawer = createDrawerNavigator();
+// const Drawer = createDrawerNavigator();
+// function DrawerNavigator() {
+
+//   return (
+
+//       <Drawer.Navigator initialRouteName="Root">
+//       {getToken() == null ? (
+//         <>
+//      <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
+//      <Stack.Screen name="Register" options={{title: 'Rejestracja'}} component={RegisterScreen} />  
+//         </>
+//       ) : (
+//         <>
+//         <Drawer.Screen name="Root" component={RootNavigator} />
+//         <Drawer.Screen name="Notifications" component={BottomTabNavigator} />
+//         </>
+//       )}
 
 
 
+      
+//       </Drawer.Navigator>
+
+
+//   );
+
+
+
+// }
 
 
 
