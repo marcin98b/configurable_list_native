@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {useRef} from 'react';
 import { StyleSheet, TouchableOpacity, TextInput, Alert, Button} from 'react-native';
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
-import {API_URL, getToken, setToken} from "../api/env";
+import { Text, View } from '../../components/Themed';
+import { RootTabScreenProps } from '../../types';
+import {API_URL, getToken, setToken} from "../../api/env";
 import { FontAwesome } from '@expo/vector-icons';
 import {Keyboard} from 'react-native'
 import { showMessage, hideMessage } from "react-native-flash-message";
@@ -170,7 +170,7 @@ const DuplicateList = async (listId) => {
 
 
  //GRAFICZNY KOMPONENT LISTY
- const Item = ({ id,title }) => (
+ const Item = ({ id,title, shop_id, share_key }) => (
   <TouchableOpacity
   onPress={() => navigation.navigate('GetList', {listId: id.toString(), name:title})}
   >
@@ -203,10 +203,28 @@ const DuplicateList = async (listId) => {
 
 {/* BUTTON EDIT */}
     <TouchableOpacity
-      onPress={() => {
+      onPress={() => 
 
-        }}   
-      style={styles.ButtonEdit}
+         navigation.navigate('EditList', 
+         {listId: id.toString(), 
+          name:title, 
+          shopId: typeof shop_id === 'number' ? shop_id.toString() : '',
+          shareKey: typeof share_key === 'string' ? share_key.toString() : '',
+         })
+     
+        }
+     
+      // onPress={() => 
+      //   {
+      //   if(typeof(shop_id) !== 'undefined' && shop_id != null) 
+      //    navigation.navigate('EditList', {listId: id.toString(), name:title, shopId: shop_id.toString()})
+      //   else
+      //    navigation.navigate('EditList', {listId: id.toString(), name:title, shopId: ""})   
+
+      //   }
+     
+      //  }
+        style={styles.ButtonEdit}
    
       >
       <FontAwesome name="edit" size={32} color="orange" />
@@ -241,7 +259,7 @@ const DuplicateList = async (listId) => {
 
 //RENDER
 const renderItem = ({ item }) => (
-  <Item title={item.name} id={item.id} />
+  <Item title={item.name} id={item.id} shop_id={item.shop_id} share_key ={item.share_key} />
 );
 
 //VIEW

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { StyleSheet, TouchableOpacity, TextInput, Keyboard, Alert, Animated } from 'react-native';
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
-import {API_URL, getToken, setToken} from "../api/env";
+import { Text, View } from '../../components/Themed';
+import { RootTabScreenProps } from '../../types';
+import {API_URL, getToken, setToken} from "../../api/env";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { FontAwesome } from '@expo/vector-icons';
 //network

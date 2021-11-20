@@ -20,18 +20,19 @@ export type RootStackParamList = {
   Register:undefined;
   Login:undefined;
   GetList:{listId:string, name:string};
+  EditList:{listId:string, name:string, shopId:string, shareKey:string};
+
 
 };
 
-export type DrawerStackParamList = {
-  Root: NavigatorScreenParams<RootTabParamList> | undefined;
-  Modal: undefined;
-  NotFound: undefined;
-  Register:undefined;
-  Login:undefined;
-  GetList:{listId:string, name:string};
+// export type DrawerStackParamList = {
+//   Root: NavigatorScreenParams<RootTabParamList> | undefined;
+//   NotFound: undefined;
+//   Register:undefined;
+//   Login:undefined;
+//   GetList:{listId:string, name:string};
 
-};
+// };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
   RootStackParamList,

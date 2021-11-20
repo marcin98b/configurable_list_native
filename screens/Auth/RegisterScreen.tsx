@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { StyleSheet, Button, TouchableOpacity, TextInput, Linking } from 'react-native';
+import { StyleSheet, Button, TouchableOpacity, TextInput } from 'react-native';
 import { onChange } from 'react-native-reanimated';
 
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
+import { Text, View } from '../../components/Themed';
+import { RootTabScreenProps } from '../../types';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import {API_URL, getToken} from "../api/env";
+import {API_URL, getToken} from "../../api/env";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
@@ -16,20 +16,23 @@ export default function LoginScreen({ navigation }: RootTabScreenProps<'TabList'
 
 
 const [login, setLogin] = useState('');
+const [name, setName] = useState('');
 const [password, setPassword] = useState('');
+const [password_confirmation, setConfirmPassword] = useState('');
+
+const Register = () => {
 
 
-const CheckCredentials = () => {
-
-
-if(login && password) { 
+if(name && login && password && password_confirmation && (password == password_confirmation)) { 
     const response = {
+        "name": name,
         "email": login,
         "password": password,
+        "password_confirmation":password_confirmation,
         "token":''
     }
 
-    axios.post(API_URL + '/login', response)
+    axios.post(API_URL + '/register', response)
     .then(
         async response => {
             await AsyncStorage.setItem("@token", response.data.token)
@@ -40,7 +43,7 @@ if(login && password) {
             );
         },
         err => {
-            alert("Błędne dane logowania!");
+            alert(err.message);
         }
 
 
@@ -53,8 +56,17 @@ if(login && password) {
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      
+     
      <Text style={styles.Listak_header}>Listak</Text>
+
+     <Text >Imię:</Text>
+      <TextInput
+        style={styles.TextInput}
+        placeholder="Podaj swoje imię"
+        onChangeText={name => setName(name)}
+        defaultValue={name}       
+      />
+
 
      <Text >E-mail:</Text>
       <TextInput
@@ -72,38 +84,18 @@ if(login && password) {
         defaultValue={password}    
         secureTextEntry
       />
+      <Text style={{paddingTop: 15}} >Potwierdź hasło:</Text>
+      <TextInput
+        style={styles.TextInput}
+        placeholder="Potwierdź swoje hasło"
+        onChangeText={password_confirmation => setConfirmPassword(password_confirmation)}
+        defaultValue={password_confirmation}    
+        secureTextEntry
+      />
 
-<TouchableOpacity
-      onPress={() => {Linking.openURL('https://listak.pl/forgot-password')}}
-      style={{
-        position:'relative',
-        right:110,
-        top:10,
-        paddingTop:5,
-      }}
-      >
-        <Text style={{
-          fontWeight:'bold'
-        }}>
-            Nie pamiętasz hasła?
-        </Text>
-
-      </TouchableOpacity>
 
       <TouchableOpacity
-      onPress={() => CheckCredentials()}
-      style={styles.Button}
-
-
-      >
-        <Text style={styles.ButtonText}>
-            Zaloguj się
-        </Text>
-
-      </TouchableOpacity>
-
-      <TouchableOpacity
-      onPress={() => navigation.navigate('Register')}     
+      onPress={() => Register()}     
       style={styles.ButtonRegister}
 
 
@@ -133,7 +125,8 @@ const styles = StyleSheet.create({
     borderRadius:5,
     borderWidth:1,
     borderColor:"#d9d9d9",
-    height:35,
+    height:45,
+    padding:10
 
   },
 
@@ -143,14 +136,6 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     fontWeight: 'bold'
 
-  },
-
-  Button: {
-    marginTop:25,
-    backgroundColor: "#9fff80",
-    width: "50%",
-    height:45,
-    borderRadius: 10
   },
 
   ButtonText: {
@@ -164,7 +149,7 @@ const styles = StyleSheet.create({
   },
 
   ButtonRegister: {
-    marginTop:10,
+    marginTop:25,
     backgroundColor: "#adadeb",
     width: "50%",
     height:45,

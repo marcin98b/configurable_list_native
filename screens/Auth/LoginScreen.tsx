@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { StyleSheet, Button, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Button, TouchableOpacity, TextInput, Linking } from 'react-native';
 import { onChange } from 'react-native-reanimated';
 
-import { Text, View } from '../components/Themed';
-import { RootTabScreenProps } from '../types';
+import { Text, View } from '../../components/Themed';
+import { RootTabScreenProps } from '../../types';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import {API_URL, getToken} from "../api/env";
+import {API_URL, getToken} from "../../api/env";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
@@ -16,22 +16,20 @@ export default function LoginScreen({ navigation }: RootTabScreenProps<'TabList'
 
 
 const [login, setLogin] = useState('');
-const [name, setName] = useState('');
 const [password, setPassword] = useState('');
-const [password_confirmation, setConfirmPassword] = useState('');
-
-const Register = () => {
 
 
-if(name && login && password && password_confirmation && (password == password_confirmation)) { 
+const CheckCredentials = () => {
+
+
+if(login && password) { 
     const response = {
-        "name": name,
         "email": login,
         "password": password,
-        "password_confirmation":password_confirmation
+        "token":''
     }
 
-    axios.post(API_URL + '/register', response)
+    axios.post(API_URL + '/login', response)
     .then(
         async response => {
             await AsyncStorage.setItem("@token", response.data.token)
@@ -42,7 +40,7 @@ if(name && login && password && password_confirmation && (password == password_c
             );
         },
         err => {
-            alert(err.message);
+            alert("Błędne dane logowania!");
         }
 
 
@@ -55,17 +53,8 @@ if(name && login && password && password_confirmation && (password == password_c
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-     
+      
      <Text style={styles.Listak_header}>Listak</Text>
-
-     <Text >Imię:</Text>
-      <TextInput
-        style={styles.TextInput}
-        placeholder="Podaj swoje imię"
-        onChangeText={name => setName(name)}
-        defaultValue={name}       
-      />
-
 
      <Text >E-mail:</Text>
       <TextInput
@@ -83,18 +72,38 @@ if(name && login && password && password_confirmation && (password == password_c
         defaultValue={password}    
         secureTextEntry
       />
-      <Text style={{paddingTop: 15}} >Potwierdź hasło:</Text>
-      <TextInput
-        style={styles.TextInput}
-        placeholder="Potwierdź swoje hasło"
-        onChangeText={password_confirmation => setConfirmPassword(password_confirmation)}
-        defaultValue={password_confirmation}    
-        secureTextEntry
-      />
 
+<TouchableOpacity
+      onPress={() => {Linking.openURL('https://listak.pl/forgot-password')}}
+      style={{
+        position:'relative',
+        right:110,
+        top:10,
+        paddingTop:5,
+      }}
+      >
+        <Text style={{
+          fontWeight:'bold'
+        }}>
+            Nie pamiętasz hasła?
+        </Text>
+
+      </TouchableOpacity>
 
       <TouchableOpacity
-      onPress={() => Register()}     
+      onPress={() => CheckCredentials()}
+      style={styles.Button}
+
+
+      >
+        <Text style={styles.ButtonText}>
+            Zaloguj się
+        </Text>
+
+      </TouchableOpacity>
+
+      <TouchableOpacity
+      onPress={() => navigation.navigate('Register')}     
       style={styles.ButtonRegister}
 
 
@@ -124,7 +133,8 @@ const styles = StyleSheet.create({
     borderRadius:5,
     borderWidth:1,
     borderColor:"#d9d9d9",
-    height:35,
+    height:45,
+    padding:15
 
   },
 
@@ -134,6 +144,14 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     fontWeight: 'bold'
 
+  },
+
+  Button: {
+    marginTop:25,
+    backgroundColor: "#9fff80",
+    width: "50%",
+    height:45,
+    borderRadius: 10
   },
 
   ButtonText: {
@@ -147,7 +165,7 @@ const styles = StyleSheet.create({
   },
 
   ButtonRegister: {
-    marginTop:25,
+    marginTop:10,
     backgroundColor: "#adadeb",
     width: "50%",
     height:45,

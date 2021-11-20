@@ -14,15 +14,25 @@ import { ColorSchemeName, Pressable, TouchableOpacity, Text } from 'react-native
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import ModalScreen from '../screens/ModalScreen';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import NotFoundScreen from '../screens/NotFoundScreen';
-import TabListScreen from '../screens/TabListScreen';
-import GetListScreen from '../screens/GetListScreen';
-import TabShopScreen from '../screens/TabShopScreen';
 
-import TabCustomProductScreen from '../screens/TabCustomProductScreen';
+
+// AUTH
+import LoginScreen from '../screens/Auth/LoginScreen';
+import RegisterScreen from '../screens/Auth/RegisterScreen';
+
+// LIST
+import TabListScreen from '../screens/List/TabListScreen';
+import GetListScreen from '../screens/List/GetListScreen';
+import EditListScreen from '../screens/List/EditListScreen';
+
+// SHOP
+import TabShopScreen from '../screens/Shop/TabShopScreen';
+
+// CUSTOM PRODUCT
+import TabCustomProductScreen from '../screens/CustomProduct/TabCustomProductScreen';
+
+import NotFoundScreen from '../screens/NotFoundScreen';
+
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import { getToken } from '../api/env';
@@ -55,11 +65,9 @@ function RootNavigator() {
      <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
      <Stack.Screen name="Register" options={{title: 'Rejestracja'}} component={RegisterScreen} />  
      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-     <Stack.Screen name="GetList" options={({ route }) => ({ title: 'Lista: "'+route.params.name+'"' })} component={GetListScreen} />       
+     <Stack.Screen name="GetList" options={({ route }) => ({ title: 'Lista: "'+route.params.name+'"' })} component={GetListScreen} />
+     <Stack.Screen name="EditList" options={({ route }) => ({ title: 'Edycja listy: "'+route.params.name+'"' })} component={EditListScreen} />         
     <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
-    <Stack.Group screenOptions={{ presentation: 'modal' }}>
-    <Stack.Screen name="Modal" component={ModalScreen} />
-    </Stack.Group>
 
     </Stack.Navigator>
   );
