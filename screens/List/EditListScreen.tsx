@@ -241,7 +241,7 @@ const EditList = async (list_id) => {
         </View>
 
         <TouchableOpacity
-      onPress={() => EditList()}
+      onPress={() => EditList(listId)}
       style={styles.Button}
 
 

@@ -21,8 +21,8 @@ export type RootStackParamList = {
   Login:undefined;
   GetList:{listId:string, name:string};
   EditList:{listId:string, name:string, shopId:string, shareKey:string};
-
-
+  GetShop:{shopId:string, name:string};
+  EditShop:{shopId:string, name:string};
 };
 
 // export type DrawerStackParamList = {

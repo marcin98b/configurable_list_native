@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity, TextInput, Keyboard, Alert, Animated } from 'react-native';
+import { StyleSheet, TouchableOpacity, TextInput, RefreshControl, Keyboard, Alert, Animated } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import {API_URL, getToken, setToken} from "../../api/env";
@@ -13,10 +13,28 @@ import { showMessage, hideMessage } from "react-native-flash-message";
 
 export default function GetListScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
  
+  const [refreshing, setRefreshing] = useState(false);
   const {listId}:any  = route.params;
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [productName, setName] = useState('');
+
+
+//Odswiezanie produktow
+  const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+  }
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    wait(500).then(() => 
+    {
+    setRefreshing(false);
+    getProducts();
+
+    });
+  }, []);
+
 
 //FUNKCJA POBIERAJĄCA PRODUKTY
   const getProducts = async () => {
@@ -225,15 +243,22 @@ const renderItem = ({ item }) => (
                 </TouchableOpacity>
           </View>
 
-
       {isLoading ? <ActivityIndicator/> : (
         <FlatList
           data={data}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           ListEmptyComponent={<Text>Brak produktow!</Text>}
+          refreshControl={
+            <RefreshControl
+              enabled={true}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
         />
       )} 
+
 
     </View>
 

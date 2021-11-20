@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useRef} from 'react';
-import { StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, RefreshControl, Button} from 'react-native';
+import { StyleSheet, TouchableOpacity, TextInput, Alert, RefreshControl, Button} from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import {API_URL, getToken, setToken} from "../../api/env";
@@ -13,28 +13,13 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-export default function TabListScreen({ navigation }: RootTabScreenProps<'TabList'>) {
+export default function GetShopScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
  
-  const [listName, setName] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-
-  const LogOut = async () => {
-
-  try {
-    await AsyncStorage.removeItem('@token').then(
-      res =>
-      {
-        navigation.replace('Login');
-      }
-    );
-
-  }
-  catch(exception) {
-    return false;
-}
-  }
-
-
+  const {shopId, name}:any  = route.params;
+  const [listName, setName] = useState('');
+  const [isLoading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
 
 //Odswiezanie list
 const wait = (timeout) => {
@@ -46,18 +31,13 @@ const onRefresh = React.useCallback(() => {
   wait(500).then(() => 
   {
   setRefreshing(false);
-  getLists();
+  getLists(shopId);
 
   });
 }, []);
-
-
   
-  const [isLoading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
-
-//FUNKCJA WCZYTUJĄCA LISTY
-  const getLists = async () => {
+//FUNKCJA WCZYTUJĄCA LISTY DANEGO SKLEPU
+  const getLists = async (shop_id) => {
     try {
 
     const token = await getToken();
@@ -74,7 +54,7 @@ const onRefresh = React.useCallback(() => {
 
     }
 
-     const response = await fetch(API_URL + '/lists', options);
+     const response = await fetch(API_URL + '/shops/' +shop_id + '/lists', options);
      const json = await response.json();
      setData(json);
    } catch (error) {
@@ -85,15 +65,16 @@ const onRefresh = React.useCallback(() => {
  }
 
 
-//FUNKCJA DODAJĄCA NOWĄ LISTĘ
- const AddList = async (listName) => {
+//FUNKCJA DODAJĄCA NOWĄ LISTĘ DO SKLEPU
+ const AddList = async (listName, shop_id) => {
   try {
 
   const token = await getToken();
   const options = {
     method: 'POST',
     body: JSON.stringify({
-      name:listName
+      name:listName,
+      shop_id:shop_id
     }),
     headers: {
       'Content-Type': 'application/json',
@@ -108,9 +89,9 @@ const onRefresh = React.useCallback(() => {
  } catch (error) {
    console.error(error);
  } finally {
-   getLists();
+   getLists(shop_id);
    showMessage({
-    message: 'Pomyślnie dodano listę "'+listName+'"!',
+    message: 'Pomyślnie dodano listę "'+listName+'" dla sklepu!',
     type:"success",
     icon:"success"
    });
@@ -141,7 +122,7 @@ const DeleteList = async (listId) => {
  } catch (error) {
    console.error(error);
  } finally {
-   getLists();
+   getLists(shopId);
    showMessage({
     message: "Pomyślnie usunięto listę!",
     type:"info",
@@ -172,7 +153,7 @@ const DuplicateList = async (listId) => {
  } catch (error) {
    console.error(error);
  } finally {
-   getLists();
+   getLists(shopId);
    showMessage({
     message: "Pomyślnie zduplikowano listę!",
     type:"success",
@@ -183,7 +164,7 @@ const DuplicateList = async (listId) => {
 }
 
  useEffect(() => {
-   getLists();
+   getLists(shopId);
  }, []);
 
 
@@ -289,11 +270,11 @@ const renderItem = ({ item }) => (
     <View style={styles.addPanel}>
     <TextInput
             style={styles.addInput}
-            placeholder="Dodaj listę ..."
+            placeholder="Dodaj listę dla sklepu ..."
             onChangeText={listName => setName(listName)}
             defaultValue={listName} 
             onSubmitEditing= {() => {
-              AddList(listName); 
+              AddList(listName, shopId); 
               setName('');
               Keyboard.dismiss();
               
@@ -302,7 +283,7 @@ const renderItem = ({ item }) => (
           <TouchableOpacity
           disabled = { listName ? false : true }
           onPress={() => {
-            AddList(listName); 
+            AddList(listName, shopId); 
             setName('');
             Keyboard.dismiss();
             
@@ -315,6 +296,8 @@ const renderItem = ({ item }) => (
 
           </TouchableOpacity>
     </View>
+
+
 
       {isLoading ? <ActivityIndicator/> : (
         <FlatList
@@ -332,23 +315,6 @@ const renderItem = ({ item }) => (
           }
         />
       )} 
-
-
-<TouchableOpacity
-
-      onPress={() => {
-        LogOut();
-        
-      }}   
-      style={styles.ButtonAdd}
-   
-
-      >
-      <Text>
-          Wyloguj
-      </Text>
-
-      </TouchableOpacity>
 
 
     </View>
