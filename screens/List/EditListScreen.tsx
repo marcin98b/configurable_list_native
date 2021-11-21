@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
 
   TextInput: {
 
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#FAFAFA",
     width: "100%",
     borderRadius:5,
     borderWidth:1,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   },
   TextInputShare: {
     color:"black",
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#FAFAFA",
     width:"100%",
     borderRadius:5,
     borderWidth:1,
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   },
   Picker: {
 
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#FAFAFA",
     width: "100%",
     borderRadius:5,
     borderWidth:1,
