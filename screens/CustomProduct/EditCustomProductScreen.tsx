@@ -14,76 +14,15 @@ import { NavigationHelpersContext } from '@react-navigation/native';
 // nie dziala w expo - uzywanie domyslnej
 //import Clipboard from '@react-native-clipboard/clipboard';
 
-export default function EditListScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
+export default function EditCustomProductScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
  
-  const {listId, shopId, shareKey}:any  = route.params;
-  const [isLoading, setLoading] = useState(true);
-  const [listData, setListData]:any = useState([]);
-  const [shopData, setShopData]:any = useState([]);
-  const [isShareKey, setShareKey]:any = useState(shareKey);
-  const [selectedShop, setSelectedShop] = useState(shopId);
-  const [listName, setListName]:any = useState('');
-
-//FUNKCJA POBIERAJĄCA LISTĘ
-  const getList = async () => {
-    try {
-
-    const token = await getToken();
-    const urlencoded = new URLSearchParams();  
-    const options = {
-      method: 'GET',
-      //body: urlencoded,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept':'application/json',
-        'Authorization': 'Bearer '+token
-        
-      },
-
-    }
-
-     const response = await fetch(API_URL + '/lists/' + listId , options);
-     const json = await response.json();
-     setListData(json);
-     setListName(json.name);
-   } catch (error) {
-     console.error(error);
-   } finally {
-     
-     //setLoading(false);
-   }
- }
-
- //Pobranie sklepów użytkownika
- const getShops = async () => {
-  try {
-
-  const token = await getToken();
-  const urlencoded = new URLSearchParams();  
-  const options = {
-    method: 'GET',
-    //body: urlencoded,
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept':'application/json',
-      'Authorization': 'Bearer '+token
-      
-    },
-
-  }
-
-   const response = await fetch(API_URL + '/shops', options);
-   const json = await response.json();
-   setShopData(json);
- } catch (error) {
-   console.error(error);
- } finally {
-   setLoading(false);
- }
-}
+  const {productId, name, description, share_key, img_filepath}:any  = route.params;
+  const [isShareKey, setShareKey]:any = useState(share_key);
+  const [productName, setProductName]:any = useState(name);
+  const [productDescription, setProductDescription]:any = useState(description);
 
 //share
-const shareProduct = async (list_id) => {
+const shareCustomProduct = async (product_id) => {
   try {
 
     var doShare;
@@ -91,7 +30,8 @@ const shareProduct = async (list_id) => {
     if(isShareKey)
       doShare = '';
     else
-      doShare = 'yes';
+      doShare = 'yes'
+      //random = (Math.random()*1e24).toString(36);
 
     const token = await getToken();
     const urlencoded = new URLSearchParams();  
@@ -109,10 +49,10 @@ const shareProduct = async (list_id) => {
 
     }
 
-     const response = await fetch(API_URL + '/lists/' + list_id, options);
+     const response = await fetch(API_URL + '/customProducts/' + product_id, options);
      const data = await response.json();
      setShareKey(data.share_key);
-     
+
    } catch (error) {
      console.error(error);
     }
@@ -121,7 +61,7 @@ const shareProduct = async (list_id) => {
 }
 
 //Edytuj dane
-const EditList = async (list_id) => {
+const EditCustomProduct = async (product_id, name, description) => {
   try {
 
     const token = await getToken();
@@ -129,8 +69,8 @@ const EditList = async (list_id) => {
     const options = {
       method: 'PUT',
       body: JSON.stringify({
-        name: listName,
-        shop_id:selectedShop
+        name: name,
+        description:description
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -141,66 +81,41 @@ const EditList = async (list_id) => {
 
     }
 
-     const response = await fetch(API_URL + '/lists/' + list_id, options);
+     const response = await fetch(API_URL + '/customProducts/' + product_id, options);
    } catch (error) {
      console.error(error);
     }
     finally {
 
-      navigation.replace('Root');
+      navigation.replace('Root', {screen:"TabCustomProduct"});
 
     }
 
 }
 
-
- useEffect(() => {
- 
-   getList();
-   getShops();
-
- }, []);
-
-
-
   return (
     <View style={styles.container}>
 
-    {isLoading ? (
-
-      <Text>Ładowanie</Text>
-
-    ) : (
 
       <>
-        <Text >Nazwa listy:</Text>
+        <Text >Nazwa  produktu:</Text>
         <TextInput
           style={styles.TextInput}
-          placeholder="Podaj nazwę listy ..."
-          onChangeText={listName => setListName(listName)}
-          value={listName}  
-          //defaultValue={listData.name}     
+          placeholder="Podaj nazwę produktu ..."
+          onChangeText={productName => setProductName(productName)}
+          value={productName}  
+        />
+     
+        <Text   style={{paddingTop: 5, }} >Opis:</Text>
+        <TextInput
+          multiline
+          numberOfLines={10}
+          style={[styles.TextInput  ]}
+          placeholder="Opisz swój produkt ..."
+          onChangeText={description => setProductDescription(description)}
+          value={productDescription}  
         />
 
-        <Text style={{paddingTop: 15}} >Sklep:</Text>
-
-        <Picker
-          selectedValue={selectedShop}
-          onValueChange={(itemValue) =>
-            setSelectedShop(itemValue)
-          }
-          style={styles.Picker}
-          >
-         <Picker.Item label="[Brak przypisania]" value="" />
-          {shopData.map((shop, id) => {
-            return (
-              <Picker.Item label={shop.name} key={shop.id.toString()} value={shop.id.toString()} />
-
-            );
-
-          })}
-
-        </Picker>
         
         <View style = {styles.ShareView}>
             <Text  style={{paddingTop: 5, }} >Udostępnij: </Text>
@@ -208,10 +123,10 @@ const EditList = async (list_id) => {
                   style={{paddingTop:3, paddingLeft:5}}
                   size={24}
                   fillColor="green"
-                  isChecked={shareKey != ''}
+                  isChecked={share_key != ''}
                   unfillColor="#ffffff"
                   iconStyle={{ borderColor: "gray" }}
-                  onPress={() => {shareProduct(listData.id); }}
+                  onPress={() => {shareCustomProduct(productId); }}
                 />
 
 
@@ -224,7 +139,7 @@ const EditList = async (list_id) => {
 
       <TouchableOpacity
       onPress={() => { 
-        Clipboard.setString('listak.pl/lists/shared/'+isShareKey); 
+        Clipboard.setString('listak.pl/customProducts/shared/'+isShareKey); 
         showMessage({
           message: 'Skopiowano adres URL listy do schowka!',
           type:"success",
@@ -236,7 +151,7 @@ const EditList = async (list_id) => {
 
         <TextInput
         style={styles.TextInputShare}
-        value={'listak.pl/lists/shared/'+isShareKey}   
+        value={'listak.pl/customProducts/shared/'+isShareKey}   
         editable={false}  
           
        />
@@ -246,7 +161,7 @@ const EditList = async (list_id) => {
 
 
         <TouchableOpacity
-      onPress={() => EditList(listId)}
+      onPress={() => EditCustomProduct(productId,productName, productDescription)}
       style={styles.Button}
 
 
@@ -258,7 +173,7 @@ const EditList = async (list_id) => {
       </TouchableOpacity>
 
       </>
-    )}
+
 
     </View>
 

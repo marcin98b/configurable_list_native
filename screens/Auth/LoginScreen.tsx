@@ -35,7 +35,7 @@ if(login && password) {
             await AsyncStorage.setItem("@token", response.data.token)
             .then(
                 response => {
-                    navigation.navigate('Root');
+                    navigation.replace('Root');
                 }
             );
         },
@@ -54,7 +54,7 @@ if(login && password) {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       
-     <Text style={styles.Listak_header}>Listak</Text>
+     <Text style={styles.Listak_header}>ListaK</Text>
 
      <Text >E-mail:</Text>
       <TextInput

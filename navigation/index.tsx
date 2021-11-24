@@ -31,6 +31,8 @@ import GetShopScreen from '../screens/Shop/GetShopScreen';
 import EditShopScreen from '../screens/Shop/EditShopScreen';
 // CUSTOM PRODUCT
 import TabCustomProductScreen from '../screens/CustomProduct/TabCustomProductScreen';
+import GetCustomProductScreen from '../screens/CustomProduct/GetCustomProductScreen';
+import EditCustomProductScreen from '../screens/CustomProduct/EditCustomProductScreen';
 
 import NotFoundScreen from '../screens/NotFoundScreen';
 
@@ -69,7 +71,9 @@ function RootNavigator() {
      <Stack.Screen name="GetList" options={({ route }) => ({ title: 'Lista: "'+route.params.name+'"' })} component={GetListScreen} />
      <Stack.Screen name="EditList" options={({ route }) => ({ title: 'Edycja listy: "'+route.params.name+'"' })} component={EditListScreen} />  
      <Stack.Screen name="GetShop" options={({ route }) => ({ title: 'Sklep: "'+route.params.name+'"' })} component={GetShopScreen} /> 
-     <Stack.Screen name="EditShop" options={({ route }) => ({ title: 'Edycja sklepu: "'+route.params.name+'"' })} component={EditShopScreen} />      
+     <Stack.Screen name="EditShop" options={({ route }) => ({ title: 'Edycja sklepu: "'+route.params.name+'"' })} component={EditShopScreen} />     
+     <Stack.Screen name="GetCustomProduct" options={({ route }) => ({ title: 'Produkt: "'+route.params.name+'"' })} component={GetCustomProductScreen} />     
+     <Stack.Screen name="EditCustomProduct" options={({ route }) => ({ title: 'Edycja produktu: "'+route.params.name+'"' })} component={EditCustomProductScreen} />    
     <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
 
     </Stack.Navigator>
@@ -128,7 +132,7 @@ function BottomTabNavigator() {
         name="TabCustomProduct"
         component={TabCustomProductScreen}
         options={{
-          title: 'Produkty',
+          title: 'Twoje produkty',
           tabBarIcon: ({ color }) => <TabBarIcon name="archive" color={color} />,
         }}
       />
