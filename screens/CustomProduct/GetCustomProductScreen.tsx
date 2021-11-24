@@ -8,6 +8,8 @@ export default function GetCustomProductScreen({ route, navigation }: RootTabScr
  
   const {productId, name, description, img_filepath, share_key}:any  = route.params;
 
+
+
   return (
 
 

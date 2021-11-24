@@ -174,7 +174,7 @@ const DeleteProduct = async (productId) => {
          {productId: id.toString(), 
           name:name, 
           description:description,
-          img_filepath:img_filepath,
+          img_filepath: typeof img_filepath === 'string' ? img_filepath.toString() : '',
           share_key: typeof share_key === 'string' ? share_key.toString() : '',
          })
      

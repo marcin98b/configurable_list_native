@@ -16,43 +16,13 @@ import { NavigationHelpersContext } from '@react-navigation/native';
 
 export default function EditListScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
  
-  const {listId, shopId, shareKey}:any  = route.params;
+  const {listId, shopId, name, shareKey}:any  = route.params;
   const [isLoading, setLoading] = useState(true);
-  const [listData, setListData]:any = useState([]);
   const [shopData, setShopData]:any = useState([]);
   const [isShareKey, setShareKey]:any = useState(shareKey);
   const [selectedShop, setSelectedShop] = useState(shopId);
-  const [listName, setListName]:any = useState('');
+  const [listName, setListName]:any = useState(name);
 
-//FUNKCJA POBIERAJĄCA LISTĘ
-  const getList = async () => {
-    try {
-
-    const token = await getToken();
-    const urlencoded = new URLSearchParams();  
-    const options = {
-      method: 'GET',
-      //body: urlencoded,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept':'application/json',
-        'Authorization': 'Bearer '+token
-        
-      },
-
-    }
-
-     const response = await fetch(API_URL + '/lists/' + listId , options);
-     const json = await response.json();
-     setListData(json);
-     setListName(json.name);
-   } catch (error) {
-     console.error(error);
-   } finally {
-     
-     //setLoading(false);
-   }
- }
 
  //Pobranie sklepów użytkownika
  const getShops = async () => {
@@ -86,19 +56,19 @@ export default function EditListScreen({ route, navigation }: RootTabScreenProps
 const shareProduct = async (list_id) => {
   try {
 
-    var doShare;
+    var random;
 
     if(isShareKey)
-      doShare = '';
+      random = '';
     else
-      doShare = 'yes';
+      random = (Math.random()*1e24).toString(36);
 
     const token = await getToken();
     const urlencoded = new URLSearchParams();  
     const options = {
       method: 'PUT',
       body: JSON.stringify({
-        share: doShare
+        share_key: random
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -130,7 +100,8 @@ const EditList = async (list_id) => {
       method: 'PUT',
       body: JSON.stringify({
         name: listName,
-        shop_id:selectedShop
+        shop_id:selectedShop,
+        share:''
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -156,7 +127,6 @@ const EditList = async (list_id) => {
 
  useEffect(() => {
  
-   getList();
    getShops();
 
  }, []);
@@ -179,7 +149,6 @@ const EditList = async (list_id) => {
           placeholder="Podaj nazwę listy ..."
           onChangeText={listName => setListName(listName)}
           value={listName}  
-          //defaultValue={listData.name}     
         />
 
         <Text style={{paddingTop: 15}} >Sklep:</Text>
@@ -211,7 +180,7 @@ const EditList = async (list_id) => {
                   isChecked={shareKey != ''}
                   unfillColor="#ffffff"
                   iconStyle={{ borderColor: "gray" }}
-                  onPress={() => {shareProduct(listData.id); }}
+                  onPress={() => {shareProduct(listId); }}
                 />
 
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity, TextInput, Keyboard, Alert, Animated, Touchable, Clipboard } from 'react-native';
+import { StyleSheet, TouchableOpacity, TextInput, Keyboard, Alert, Animated, Touchable, Image, Clipboard } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import {API_URL, getToken, setToken} from "../../api/env";
@@ -20,25 +20,26 @@ export default function EditCustomProductScreen({ route, navigation }: RootTabSc
   const [isShareKey, setShareKey]:any = useState(share_key);
   const [productName, setProductName]:any = useState(name);
   const [productDescription, setProductDescription]:any = useState(description);
+  const [ImagePath, setImagePath]:any = useState(img_filepath);
+
 
 //share
 const shareCustomProduct = async (product_id) => {
   try {
 
-    var doShare;
+    var random;
 
     if(isShareKey)
-      doShare = '';
+      random = '';
     else
-      doShare = 'yes'
-      //random = (Math.random()*1e24).toString(36);
+      random = (Math.random()*1e24).toString(36);
 
     const token = await getToken();
     const urlencoded = new URLSearchParams();  
     const options = {
       method: 'PUT',
       body: JSON.stringify({
-        share: doShare
+        share_key: random
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -98,6 +99,19 @@ const EditCustomProduct = async (product_id, name, description) => {
 
 
       <>
+
+      <View style={styles.productHeader}>
+        
+                <Image
+                style={styles.productImage}
+                defaultSource={require('../../assets/images/Blank.png')}
+                source={img_filepath
+                        ? {uri: 'https://listak.pl/storage/'+img_filepath}                      
+                        : require('../../assets/images/Blank.png')} 
+                />
+            </View>
+
+
         <Text >Nazwa  produktu:</Text>
         <TextInput
           style={styles.TextInput}
@@ -110,7 +124,7 @@ const EditCustomProduct = async (product_id, name, description) => {
         <TextInput
           multiline
           numberOfLines={10}
-          style={[styles.TextInput  ]}
+          style={[styles.TextInput, {height:80, textAlignVertical: "top" }]}
           placeholder="Opisz swój produkt ..."
           onChangeText={description => setProductDescription(description)}
           value={productDescription}  
@@ -167,7 +181,7 @@ const EditCustomProduct = async (product_id, name, description) => {
 
       >
         <Text style={styles.ButtonText}>
-            Edytuj listę
+            Edytuj produkt
         </Text>
 
       </TouchableOpacity>
@@ -217,17 +231,22 @@ const styles = StyleSheet.create({
     height:55,
     padding:15,
     textAlign: 'left',
+    fontSize:12
 
   },
-  Picker: {
-    color: 'black',
-    backgroundColor: "#FAFAFA",
-    width: "100%",
-    borderRadius:5,
+  productHeader: {
+    
+    alignItems: 'center',
+
+  },
+
+  productImage: {
+
+    borderRadius: 100,
     borderWidth:1,
-    borderColor:"#d9d9d9",
-    height:55,
-    padding:15
+    width: 120,
+    height:120,
+    borderColor: '#CCCCCC',
 
   },
 

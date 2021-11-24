@@ -240,19 +240,7 @@ const renderItem = ({ item, drag, isActive }: RenderItemParams<Item>) => {
         <Text style={{flex:1}} >{item.name}</Text>
                 {/* BUTTON DELETE */}
       <TouchableOpacity
-      onPress={() => {
-        
-        Alert.alert('Usunięcie kategorii', 'Potwierdź usunięcie kategorii: "' +item.name+'".',
-        [
-          {
-            text: "Usuń",
-            onPress: () => DeleteCategory(shopId,item.id)
-          },
-          { text: "Anuluj", onPress: () => console.log('Anulowano')}
-        ]
-        )
-        
-        }}   
+      onPress={() => { DeleteCategory(shopId,item.id) }}   
       style={{flex:0}}
    
       >
