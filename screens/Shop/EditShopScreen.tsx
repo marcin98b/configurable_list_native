@@ -129,7 +129,7 @@ const EditCategoryOrder = async (shop_id) => {
     const urlencoded = new URLSearchParams();  
     const options = {
       method: 'POST',
-      body: {},
+      //body: urlencoded,
       headers: {
         'Content-Type': 'application/json',
         'Accept':'application/json',

@@ -1,18 +1,15 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity, TextInput, Keyboard, Alert, Animated, Touchable, Image, Clipboard } from 'react-native';
+import { Platform, StyleSheet, SafeAreaView, Pressable, TouchableOpacity, TextInput, Modal, Keyboard, Alert, Animated, Touchable, Image, Clipboard } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import {API_URL, getToken, setToken} from "../../api/env";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { FontAwesome } from '@expo/vector-icons';
 //network
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList } from 'react-native';
+import { useEffect, useState, useCallback } from 'react';
 import { showMessage, hideMessage } from "react-native-flash-message";
-import {Picker} from '@react-native-picker/picker';
-import { NavigationHelpersContext } from '@react-navigation/native';
-// nie dziala w expo - uzywanie domyslnej
-//import Clipboard from '@react-native-clipboard/clipboard';
+import * as ImagePicker from 'expo-image-picker';
+
 
 export default function EditCustomProductScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
  
@@ -21,7 +18,7 @@ export default function EditCustomProductScreen({ route, navigation }: RootTabSc
   const [productName, setProductName]:any = useState(name);
   const [productDescription, setProductDescription]:any = useState(description);
   const [ImagePath, setImagePath]:any = useState(img_filepath);
-
+  const [PhotoData, setImageData]:any = useState(null);
 
 //share
 const shareCustomProduct = async (product_id) => {
@@ -94,21 +91,94 @@ const EditCustomProduct = async (product_id, name, description) => {
 
 }
 
+useEffect(() => {
+
+  (async () => {
+    if (Platform.OS !== 'web') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Potrzebne uprawnienia');
+      }
+    }
+  })();
+
+}, []);
+
+
+//Wybieranie zdjęcia
+const PickImage = async () => {
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    aspect: [4, 3],
+    quality: 0.5,
+    base64:true
+  });
+
+  console.log(result);
+
+  if (!result.cancelled) {
+    setImageData(result);
+    console.log(result.type);
+    console.log(result.uri);
+  } else return;
+
+  const token = await getToken();
+
+    let fileType = result.uri.substring(result.uri.lastIndexOf(".") + 1);
+    console.log(fileType);
+    let formData = new FormData();
+
+    formData.append("image", {
+      uri: result.uri,
+      name: `photo.${fileType}`,
+      type: `image/${fileType}`
+    });
+
+    let options = {
+      method: "POST",
+      body: formData,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "multipart/form-data",
+        'Authorization': 'Bearer '+token
+      }
+    };
+    return await fetch(API_URL + '/customProducts/' + productId + '/upload', options)
+    .then(response => response.text())
+    .then(result => {
+      console.log(result);
+      setImagePath('products/'+ result);
+      }
+    )
+    .catch(error => console.log('error', error));
+};
+
+
+
+
+
   return (
     <View style={styles.container}>
-
 
       <>
 
       <View style={styles.productHeader}>
         
+        <TouchableOpacity
+          onPress={PickImage}
+        >
                 <Image
                 style={styles.productImage}
                 defaultSource={require('../../assets/images/Blank.png')}
-                source={img_filepath
-                        ? {uri: 'https://listak.pl/storage/'+img_filepath}                      
+                source={ImagePath
+                        ? {uri: 'https://listak.pl/storage/'+ImagePath}                      
                         : require('../../assets/images/Blank.png')} 
                 />
+
+        <FontAwesome style={styles.productUploadIcon} name="cloud-upload" size={48} color="blue" />
+
+        </TouchableOpacity>
             </View>
 
 
@@ -189,7 +259,13 @@ const EditCustomProduct = async (product_id, name, description) => {
       </>
 
 
+ 
+
+
+
     </View>
+
+
 
   );
 
@@ -244,8 +320,8 @@ const styles = StyleSheet.create({
 
     borderRadius: 100,
     borderWidth:1,
-    width: 120,
-    height:120,
+    width: 150,
+    height:150,
     borderColor: '#CCCCCC',
 
   },
@@ -271,4 +347,11 @@ const styles = StyleSheet.create({
       
 
   },
+  productUploadIcon: {
+
+    position:'absolute',
+    top:110,
+    left:90
+
+  }
 });
