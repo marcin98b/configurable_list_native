@@ -7,14 +7,15 @@ import {API_URL, getToken, setToken} from "../../api/env";
 import { FontAwesome } from '@expo/vector-icons';
 import {Keyboard} from 'react-native'
 import { showMessage, hideMessage } from "react-native-flash-message";
-
+import moment from "moment";
+import 'moment/locale/pl';
 //network
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function TabListScreen({ navigation }: RootTabScreenProps<'TabList'>) {
- 
+  
   const [listName, setName] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -189,12 +190,16 @@ const DuplicateList = async (listId) => {
 
 
  //GRAFICZNY KOMPONENT LISTY
- const Item = ({ id,title, shop_id, share_key }) => (
+ const Item = ({ id,title, shop_id, share_key, productsCounted, productsAvalaible, created_at }) => (
   <TouchableOpacity
   onPress={() => navigation.navigate('GetList', {listId: id.toString(), name:title})}
   >
   <View style={styles.item}>
+
     <Text style={styles.title}>{title}</Text>
+    <Text style={styles.counter}>{productsCounted} / {productsAvalaible}</Text>
+    <Text style={styles.dateCreated}>{moment(created_at).locale("pl").fromNow()}</Text>
+
 
 
 {/* BUTTON DUPLICATE */}
@@ -278,7 +283,14 @@ const DuplicateList = async (listId) => {
 
 //RENDER
 const renderItem = ({ item }) => (
-  <Item title={item.name} id={item.id} shop_id={item.shop_id} share_key ={item.share_key} />
+  <Item title={item.name} 
+        id={item.id} 
+        shop_id={item.shop_id} 
+        share_key ={item.share_key} 
+        productsAvalaible={item.productsAvalaible}
+        productsCounted={item.productsCounted}
+        created_at={item.created_at}
+  />
 );
 
 //VIEW
@@ -369,8 +381,24 @@ const styles = StyleSheet.create({
   },
   title: {
     flex:6,
+    bottom:10,
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  counter: {
+    position:'absolute',
+    top:35,
+    left:20,
+    color:"gray",
+    fontSize:14
+  },
+  dateCreated: {
+    position:'absolute',
+    top:55,
+    left:'40%',
+    color:"gray",
+    fontSize:12
+
   },
   separator: {
     marginVertical: 30,

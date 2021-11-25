@@ -165,9 +165,7 @@ const PickImage = async () => {
 
       <View style={styles.productHeader}>
         
-        <TouchableOpacity
-          onPress={PickImage}
-        >
+
                 <Image
                 style={styles.productImage}
                 defaultSource={require('../../assets/images/Blank.png')}
@@ -175,10 +173,23 @@ const PickImage = async () => {
                         ? {uri: 'https://listak.pl/storage/'+ImagePath}                      
                         : require('../../assets/images/Blank.png')} 
                 />
+       <TouchableOpacity
+          style={styles.productUploadIcon} 
 
-        <FontAwesome style={styles.productUploadIcon} name="cloud-upload" size={48} color="blue" />
-
+          onPress={PickImage}
+        >
+               <FontAwesome name="cloud-upload" size={42} color="blue" />
+       
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.productPictureIcon}
+          onPress={() => {}}
+        >
+            <FontAwesome  name="camera" size={36} color="gray" />
+       
+        </TouchableOpacity>
+
             </View>
 
 
@@ -349,9 +360,17 @@ const styles = StyleSheet.create({
   },
   productUploadIcon: {
 
-    position:'absolute',
-    top:110,
-    left:90
+    position:'absolute', 
+    top:120,
+    right:"16%"
+
+  },
+
+  productPictureIcon: {
+
+    position:'absolute', 
+    top:122,
+    right:"3%"
 
   }
 });
