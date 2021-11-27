@@ -319,68 +319,9 @@ const renderItem = ({ item }) => (
     </View>
   )
 
-//VIEW
-  return (
-    <View style={styles.container}>
 
-
-    <View style={styles.addPanel}>
-    <TextInput
-            style={styles.addInput}
-            placeholder="Dodaj listę dla sklepu ..."
-            onChangeText={listName => setName(listName)}
-            defaultValue={listName} 
-            onSubmitEditing= {() => {
-              AddList(listName, shopId); 
-              setName('');
-              Keyboard.dismiss();
-              
-            }}        
-    />
-          <TouchableOpacity
-          disabled = { listName ? false : true }
-          onPress={() => {
-            AddList(listName, shopId); 
-            setName('');
-            Keyboard.dismiss();
-            
-          }}   
-          style={styles.ButtonAdd}
-      
-
-          >
-          <FontAwesome name="plus-circle" size={55} color={listName ? "green" : "gray"} />
-
-          </TouchableOpacity>
-    </View>
-
-
-
-      {isLoading ? <ActivityIndicator/> : (
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
-          extraData={listName}
-          ListEmptyComponent={<Text>Brak list!</Text>}
-          refreshControl={
-            <RefreshControl
-              enabled={true}
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
-          }
-        />
-      )} 
-
-
-    </View>
-    
-
-
-
-  );
 }
+
 
 //STYLE
 const styles = StyleSheet.create({
