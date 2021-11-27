@@ -18,7 +18,7 @@ export default function EditCustomProductScreen({ route, navigation }: RootTabSc
   const [productName, setProductName]:any = useState(name);
   const [productDescription, setProductDescription]:any = useState(description);
   const [ImagePath, setImagePath]:any = useState(img_filepath);
-  const [PhotoData, setImageData]:any = useState(null);
+  //const [PhotoData, setImageData]:any = useState(null);
 
 //share
 const shareCustomProduct = async (product_id) => {
@@ -105,55 +105,78 @@ useEffect(() => {
 }, []);
 
 
-//Wybieranie zdjęcia
+//Dodawanie zdjęcia - przez album
 const PickImage = async () => {
   let result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
     allowsEditing: true,
-    aspect: [4, 3],
     quality: 0.5,
     base64:true
   });
 
-  console.log(result);
+  //console.log(result);
 
-  if (!result.cancelled) {
-    setImageData(result);
-    console.log(result.type);
-    console.log(result.uri);
-  } else return;
+  if (!result.cancelled)
+    UploadPhoto(result);
+  else return;
 
-  const token = await getToken();
-
-    let fileType = result.uri.substring(result.uri.lastIndexOf(".") + 1);
-    console.log(fileType);
-    let formData = new FormData();
-
-    formData.append("image", {
-      uri: result.uri,
-      name: `photo.${fileType}`,
-      type: `image/${fileType}`
-    });
-
-    let options = {
-      method: "POST",
-      body: formData,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "multipart/form-data",
-        'Authorization': 'Bearer '+token
-      }
-    };
-    return await fetch(API_URL + '/customProducts/' + productId + '/upload', options)
-    .then(response => response.text())
-    .then(result => {
-      console.log(result);
-      setImagePath('products/'+ result);
-      }
-    )
-    .catch(error => console.log('error', error));
 };
 
+//Dodawanie zdjęcia - przez kamerę
+const PickCameraPhoto = async () => {
+
+  const permission = await ImagePicker.requestCameraPermissionsAsync();
+  if(!permission.granted) return;
+  else
+  {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.5,
+      base64: true
+
+    });
+
+    if(!result.cancelled)
+      UploadPhoto(result);
+
+  }
+
+
+}
+
+const UploadPhoto = async (result) => {
+
+  const token = await getToken();
+  let fileType = result.uri.substring(result.uri.lastIndexOf(".") + 1);
+  console.log(fileType);
+  let formData = new FormData();
+
+  formData.append("image", {
+    uri: result.uri,
+    name: `photo.${fileType}`,
+    type: `image/${fileType}`
+  });
+
+  let options = {
+    method: "POST",
+    body: formData,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "multipart/form-data",
+      'Authorization': 'Bearer '+token
+    }
+  };
+  return await fetch(API_URL + '/customProducts/' + productId + '/upload', options)
+  .then(response => response.text())
+  .then(result => {
+    console.log(result);
+    setImagePath('products/'+ result);
+    }
+  )
+  .catch(error => console.log('error', error));
+
+}
 
 
 
@@ -184,7 +207,7 @@ const PickImage = async () => {
 
         <TouchableOpacity
           style={styles.productPictureIcon}
-          onPress={() => {}}
+          onPress={PickCameraPhoto}
         >
             <FontAwesome  name="camera" size={36} color="gray" />
        

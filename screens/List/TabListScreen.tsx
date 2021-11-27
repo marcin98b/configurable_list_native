@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {useRef} from 'react';
 import { StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView, RefreshControl, Button} from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
@@ -197,7 +196,7 @@ const DuplicateList = async (listId) => {
   <View style={styles.item}>
 
     <Text style={styles.title}>{title}</Text>
-    <Text style={styles.counter}>{productsCounted} / {productsAvalaible}</Text>
+    <Text style={styles.counter}>Produkty: {productsCounted} / {productsAvalaible}</Text>
     <Text style={styles.dateCreated}>{moment(created_at).locale("pl").fromNow()}</Text>
 
 
@@ -237,17 +236,6 @@ const DuplicateList = async (listId) => {
          })
      
         }
-     
-      // onPress={() => 
-      //   {
-      //   if(typeof(shop_id) !== 'undefined' && shop_id != null) 
-      //    navigation.navigate('EditList', {listId: id.toString(), name:title, shopId: shop_id.toString()})
-      //   else
-      //    navigation.navigate('EditList', {listId: id.toString(), name:title, shopId: ""})   
-
-      //   }
-     
-      //  }
         style={styles.ButtonEdit}
    
       >
@@ -344,24 +332,6 @@ const renderItem = ({ item }) => (
           }
         />
       )} 
-
-
-<TouchableOpacity
-
-      onPress={() => {
-        LogOut();
-        
-      }}   
-      style={styles.ButtonAdd}
-   
-
-      >
-      <Text>
-          Wyloguj
-      </Text>
-
-      </TouchableOpacity>
-
 
     </View>
     

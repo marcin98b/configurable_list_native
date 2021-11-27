@@ -141,12 +141,13 @@ const DeleteShop = async (shopId) => {
 
 
  //GRAFICZNY KOMPONENT LISTY
- const Item = ({ id,title}) => (
+ const Item = ({ id,title, assignedLists}) => (
   <TouchableOpacity
   onPress={() => navigation.navigate('GetShop', {shopId: id.toString(), name:title})}
   >
   <View style={styles.item}>
     <Text style={styles.title}>{title}</Text>
+    <Text style={styles.counter}>Przypisanych list: {assignedLists}</Text>
 
 {/* BUTTON EDIT */}
     <TouchableOpacity
@@ -193,7 +194,7 @@ const DeleteShop = async (shopId) => {
 
 //RENDER
 const renderItem = ({ item }) => (
-  <Item title={item.name} id={item.id} />
+  <Item title={item.name} id={item.id} assignedLists={item.assignedLists} />
 );
 
 //VIEW
@@ -269,8 +270,16 @@ const styles = StyleSheet.create({
   },
   title: {
     flex:6,
+    bottom:10,
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  counter: {
+    position:'absolute',
+    top:35,
+    left:20,
+    color:"gray",
+    fontSize:14
   },
   separator: {
     marginVertical: 30,

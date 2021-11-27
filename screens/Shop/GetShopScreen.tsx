@@ -7,7 +7,8 @@ import {API_URL, getToken, setToken} from "../../api/env";
 import { FontAwesome } from '@expo/vector-icons';
 import {Keyboard} from 'react-native'
 import { showMessage, hideMessage } from "react-native-flash-message";
-
+import moment from "moment";
+import 'moment/locale/pl';
 //network
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList } from 'react-native';
@@ -170,12 +171,16 @@ const DuplicateList = async (listId) => {
 
 
  //GRAFICZNY KOMPONENT LISTY
- const Item = ({ id,title, shop_id, share_key }) => (
+ const Item = ({ id,title, shop_id, share_key, productsCounted, productsAvalaible, created_at }) => (
   <TouchableOpacity
   onPress={() => navigation.navigate('GetList', {listId: id.toString(), name:title})}
   >
   <View style={styles.item}>
+
     <Text style={styles.title}>{title}</Text>
+    <Text style={styles.counter}>Produkty: {productsCounted} / {productsAvalaible}</Text>
+    <Text style={styles.dateCreated}>{moment(created_at).locale("pl").fromNow()}</Text>
+
 
 
 {/* BUTTON DUPLICATE */}
@@ -213,17 +218,6 @@ const DuplicateList = async (listId) => {
          })
      
         }
-     
-      // onPress={() => 
-      //   {
-      //   if(typeof(shop_id) !== 'undefined' && shop_id != null) 
-      //    navigation.navigate('EditList', {listId: id.toString(), name:title, shopId: shop_id.toString()})
-      //   else
-      //    navigation.navigate('EditList', {listId: id.toString(), name:title, shopId: ""})   
-
-      //   }
-     
-      //  }
         style={styles.ButtonEdit}
    
       >
@@ -259,8 +253,71 @@ const DuplicateList = async (listId) => {
 
 //RENDER
 const renderItem = ({ item }) => (
-  <Item title={item.name} id={item.id} shop_id={item.shop_id} share_key ={item.share_key} />
+  <Item title={item.name} 
+        id={item.id} 
+        shop_id={item.shop_id} 
+        share_key ={item.share_key} 
+        productsAvalaible={item.productsAvalaible}
+        productsCounted={item.productsCounted}
+        created_at={item.created_at}
+  />
 );
+
+//VIEW
+  return (
+    <View style={styles.container}>
+
+
+    <View style={styles.addPanel}>
+    <TextInput
+            style={styles.addInput}
+            placeholder="Dodaj listę ..."
+            onChangeText={listName => setName(listName)}
+            defaultValue={listName} 
+            onSubmitEditing= {() => {
+              AddList(listName, shopId); 
+              setName('');
+              Keyboard.dismiss();
+              
+            }}        
+    />
+          <TouchableOpacity
+          disabled = { listName ? false : true }
+          onPress={() => {
+            AddList(listName, shopId); 
+            setName('');
+            Keyboard.dismiss();
+            
+          }}   
+          style={styles.ButtonAdd}
+      
+
+          >
+          <FontAwesome name="plus-circle" size={55} color={listName ? "green" : "gray"} />
+
+          </TouchableOpacity>
+    </View>
+
+      {isLoading ? <ActivityIndicator/> : (
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={item => item.id.toString()}
+          extraData={listName}
+          ListEmptyComponent={<Text>Brak list!</Text>}
+          refreshControl={
+            <RefreshControl
+              enabled={true}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
+        />
+      )} 
+
+
+    </View>
+  )
 
 //VIEW
   return (
@@ -335,8 +392,24 @@ const styles = StyleSheet.create({
   },
   title: {
     flex:6,
+    bottom:10,
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  counter: {
+    position:'absolute',
+    top:35,
+    left:20,
+    color:"gray",
+    fontSize:14
+  },
+  dateCreated: {
+    position:'absolute',
+    top:55,
+    left:'40%',
+    color:"gray",
+    fontSize:12
+
   },
   separator: {
     marginVertical: 30,
