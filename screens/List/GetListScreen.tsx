@@ -7,8 +7,9 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { FontAwesome } from '@expo/vector-icons';
 //network
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList } from 'react-native';
+import { ActivityIndicator, SectionList } from 'react-native';
 import { showMessage, hideMessage } from "react-native-flash-message";
+import _ from 'lodash';
 
 
 export default function GetListScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
@@ -16,7 +17,7 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
   const [refreshing, setRefreshing] = useState(false);
   const {listId}:any  = route.params;
   const [isLoading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [data, setData] : any = useState([]);
   const [productName, setName] = useState('');
 
 
@@ -56,7 +57,36 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
 
      const response = await fetch(API_URL + '/lists/' + listId + '/products', options);
      const json = await response.json();
-     setData(json);
+
+     //przeksztalcenie danych do postaci
+     // [
+     //    'title': '',
+     //    'data': []
+     // ]
+     const newJson : string[] = [];
+
+     json.map( item => {
+         newJson.push(
+             _.mapKeys( item, ( value, key ) => {
+                 let newKey = key;
+                 if( key === 'name' ) {
+                     newKey = 'title';
+                 }
+     
+                 if( key === 'products' ) {
+                     newKey = 'data';
+                 }
+     
+                 return newKey;
+             })
+         )
+     });
+     
+     setData(newJson);
+     console.log( newJson );
+
+ 
+
    } catch (error) {
      console.error(error);
    } finally {
@@ -244,19 +274,32 @@ const renderItem = ({ item }) => (
           </View>
 
       {isLoading ? <ActivityIndicator/> : (
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
-          ListEmptyComponent={<Text>Brak produktow!</Text>}
-          refreshControl={
-            <RefreshControl
-              enabled={true}
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
-          }
-        />
+            <SectionList
+            sections={data}
+            keyExtractor={item => item.id.toString()}
+            renderItem={renderItem}
+            renderSectionHeader={({ section: { title } }) => (
+              <Text>{title}</Text>
+            )}
+          />
+
+
+        // <>
+        // </>
+
+        // <FlatList
+        //   data={data}
+        //   renderItem={renderItem}
+        //   keyExtractor={item => item.id.toString()}
+        //   ListEmptyComponent={<Text>Brak produktow!</Text>}
+        //   refreshControl={
+        //     <RefreshControl
+        //       enabled={true}
+        //       refreshing={refreshing}
+        //       onRefresh={onRefresh}
+        //     />
+        //   }
+        // />
       )} 
 
 

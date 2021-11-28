@@ -271,7 +271,7 @@ const renderItem = ({ item }) => (
     <View style={styles.addPanel}>
     <TextInput
             style={styles.addInput}
-            placeholder="Dodaj listę ..."
+            placeholder="Dodaj listę do sklepu ..."
             onChangeText={listName => setName(listName)}
             defaultValue={listName} 
             onSubmitEditing= {() => {
