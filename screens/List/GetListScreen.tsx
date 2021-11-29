@@ -63,27 +63,37 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
      //    'title': '',
      //    'data': []
      // ]
-     const newJson : string[] = [];
+     console.log(json);
+     let newJson : string[] = [];
 
-     json.map( item => {
-         newJson.push(
-             _.mapKeys( item, ( value, key ) => {
-                 let newKey = key;
-                 if( key === 'name' ) {
-                     newKey = 'title';
-                 }
-     
-                 if( key === 'products' ) {
-                     newKey = 'data';
-                 }
-     
-                 return newKey;
-             })
-         )
-     });
-     
-     setData(newJson);
-     console.log( newJson );
+     if(Array.isArray(json)) //Array of Objects
+     {
+      json.map( item => {
+          newJson.push(
+              _.mapKeys( item, ( value, key ) => {
+                  let newKey = key;
+                  if( key === 'name' )
+                      newKey = 'title';
+                      
+                  if( key === 'products' )
+                      newKey = 'data';
+      
+                  return newKey;
+              })
+          )
+      });
+      setData(newJson);
+     }
+     else // Single Object
+     {
+        let newJson = JSON.stringify(json);
+        newJson = newJson.replace("name", "title");
+        newJson = newJson.replace("products", "data");   
+        newJson = "[" + newJson + "];";
+        newJson = JSON.parse(newJson);
+        setData(newJson);
+     }
+     //console.log( newJson );
 
  
 
