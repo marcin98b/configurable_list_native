@@ -8,7 +8,6 @@ import {Keyboard} from 'react-native'
 import { showMessage, hideMessage } from "react-native-flash-message";
 import moment from "moment";
 import 'moment/locale/pl';
-//network
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList } from 'react-native';
 
@@ -185,6 +184,7 @@ const DuplicateList = async (listId) => {
  useEffect(() => {
    getLists();
  }, []);
+
 
 
 

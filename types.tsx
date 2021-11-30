@@ -23,7 +23,7 @@ export type RootStackParamList = {
   EditList:{listId:string, name:string, shopId:string, shareKey:string};
   GetShop:{shopId:string, name:string};
   EditShop:{shopId:string, name:string};
-  GetCustomProduct:{productId:any, name:string, description:string, img_filepath:string, share_key:string};  
+  GetCustomProduct:{productId:any};  
   EditCustomProduct:{productId:string, name:string, description:string, img_filepath:string, share_key:string};  
 };
 

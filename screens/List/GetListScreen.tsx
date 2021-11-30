@@ -1,16 +1,14 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity, TextInput, RefreshControl, Keyboard, Alert, Animated } from 'react-native';
+import { StyleSheet, TouchableOpacity, TextInput, RefreshControl, Keyboard, Alert, Animated, Touchable } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import {API_URL, getToken, setToken} from "../../api/env";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { FontAwesome } from '@expo/vector-icons';
-//network
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, SectionList } from 'react-native';
 import { showMessage, hideMessage } from "react-native-flash-message";
 import _ from 'lodash';
-
 
 export default function GetListScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
  
@@ -209,7 +207,7 @@ const DeleteProduct = async (listId, productId) => {
 
  //Komponent listy
 
- const Item = ({ id,title, ticked}) => (
+ const Item = ({ id,title, ticked, custom_product_id}) => (
 
 
   <View style={[styles.item, {
@@ -226,7 +224,19 @@ const DeleteProduct = async (listId, productId) => {
       onPress={() => {TickProduct(id, ticked); ticked = !ticked }}
     />
 
-        <Text style={styles.title}>{title}</Text>
+      {custom_product_id ?
+            (
+            <TouchableOpacity 
+                    style={{ flexDirection:'row-reverse', flex:1}}
+                    onPress = {() => navigation.navigate('GetCustomProduct', {productId:custom_product_id})}
+            >
+                <Text style={[styles.title,{color:'blue', textDecorationLine:"underline"}]}>{title}</Text>
+            </TouchableOpacity>
+            )
+          :
+            <Text style={styles.title}>{title}</Text>
+      }
+
 
 {/* BUTTON DELETE */}
 <TouchableOpacity
@@ -245,7 +255,9 @@ const DeleteProduct = async (listId, productId) => {
 const renderItem = ({ item }) => (
   <Item title={item.name}
         id={item.id} 
-        ticked={item.ticked} />
+        ticked={item.ticked}
+        custom_product_id={item.custom_product_id}      
+  />
 );
 
 
@@ -293,23 +305,6 @@ const renderItem = ({ item }) => (
             )}
           />
 
-
-        // <>
-        // </>
-
-        // <FlatList
-        //   data={data}
-        //   renderItem={renderItem}
-        //   keyExtractor={item => item.id.toString()}
-        //   ListEmptyComponent={<Text>Brak produktow!</Text>}
-        //   refreshControl={
-        //     <RefreshControl
-        //       enabled={true}
-        //       refreshing={refreshing}
-        //       onRefresh={onRefresh}
-        //     />
-        //   }
-        // />
       )} 
 
 

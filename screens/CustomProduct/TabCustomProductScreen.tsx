@@ -142,12 +142,7 @@ const DeleteProduct = async (productId) => {
  const Item = ({ id,name, description, img_filepath, share_key}) => (
   <TouchableOpacity
   onPress={() => navigation.navigate('GetCustomProduct', 
-  {productId: id.toString(), 
-   name:name, 
-   description:description,
-   img_filepath:img_filepath,
-   share_key: typeof share_key === 'string' ? share_key.toString() : '',
-  })
+  {productId: id.toString() })
   
   
   
