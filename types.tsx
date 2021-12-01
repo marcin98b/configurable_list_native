@@ -19,7 +19,7 @@ export type RootStackParamList = {
   NotFound: undefined;
   Register:undefined;
   Login:undefined;
-  GetList:{listId:string, name:string};
+  GetList:{listId:string,shopId:string, name:string};
   EditList:{listId:string, name:string, shopId:string, shareKey:string};
   GetShop:{shopId:string, name:string};
   EditShop:{shopId:string, name:string};

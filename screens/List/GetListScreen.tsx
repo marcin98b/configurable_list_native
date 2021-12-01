@@ -8,14 +8,17 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, SectionList } from 'react-native';
 import { showMessage, hideMessage } from "react-native-flash-message";
+import {Picker} from '@react-native-picker/picker';
 import _ from 'lodash';
 
 export default function GetListScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
  
   const [refreshing, setRefreshing] = useState(false);
-  const {listId}:any  = route.params;
+  const {listId, shopId}:any  = route.params;
   const [isLoading, setLoading] = useState(true);
-  const [data, setData] : any = useState([]);
+  const [productData, setProductData] : any = useState([]);
+  const [categoryData, setCategoryData] : any = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [productName, setName] = useState('');
 
 
@@ -61,7 +64,7 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
      //    'title': '',
      //    'data': []
      // ]
-     console.log(json);
+     //console.log(json);
      let newJson : string[] = [];
 
      if(Array.isArray(json)) //Array of Objects
@@ -80,7 +83,7 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
               })
           )
       });
-      setData(newJson);
+      setProductData(newJson);
      }
      else // Single Object
      {
@@ -89,7 +92,7 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
         newJson = newJson.replace("products", "data");   
         newJson = "[" + newJson + "];";
         newJson = JSON.parse(newJson);
-        setData(newJson);
+        setProductData(newJson);
      }
      //console.log( newJson );
 
@@ -102,15 +105,44 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
    }
  }
 
+//FUNKCJA WCZYTUJĄCA LISTY DANEGO SKLEPU
+const getCategories = async (shop_id) => {
+  try {
+
+  const token = await getToken();
+  const urlencoded = new URLSearchParams();  
+  const options = {
+    method: 'GET',
+    //body: urlencoded,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept':'application/json',
+      'Authorization': 'Bearer '+token
+      
+    },
+
+  }
+
+   const response = await fetch(API_URL + '/shops/' +shop_id + '/categories', options);
+   const json = await response.json();
+   setCategoryData(json);
+ } catch (error) {
+   console.error(error);
+ } 
+}
+
+
+
 //FUNKCJA DODAJĄCY NOWY PRODUKT
-const AddProduct = async (listId, productName) => {
+const AddProduct = async (listId, productName, shop_category_id) => {
   try {
 
   const token = await getToken();
   const options = {
     method: 'POST',
     body: JSON.stringify({
-      name:productName
+      name:productName,
+      shop_category_id: shop_category_id
     }),
     headers: {
       'Content-Type': 'application/json',
@@ -201,6 +233,7 @@ const DeleteProduct = async (listId, productId) => {
 
 
  useEffect(() => {
+   shopId != '' ? getCategories(shopId): null;
    getProducts();
  }, []);
 
@@ -210,14 +243,12 @@ const DeleteProduct = async (listId, productId) => {
  const Item = ({ id,title, ticked, custom_product_id}) => (
 
 
-  <View style={[styles.item, {
-    flexDirection: "row"
-  }]}>
+  <View style={ticked ? styles.itemChecked: styles.item}>
 
 
     <BouncyCheckbox
       size={30}
-      fillColor="blue"
+      fillColor="green"
       isChecked={ticked}
       unfillColor="#FFFFFF"
       iconStyle={{ borderColor: "white" }}
@@ -272,7 +303,7 @@ const renderItem = ({ item }) => (
                   onChangeText={productName => setName(productName)}
                   defaultValue={productName} 
                   onSubmitEditing= {() => {
-                    AddProduct(listId, productName); 
+                    AddProduct(listId, productName, selectedCategory); 
                     setName('');
                     //Keyboard.dismiss();
                     
@@ -281,7 +312,7 @@ const renderItem = ({ item }) => (
                 <TouchableOpacity
                 disabled = { productName ? false : true }
                 onPress={() => {
-                  AddProduct(listId, productName); 
+                  AddProduct(listId, productName, selectedCategory); 
                   setName('');
                  // Keyboard.dismiss();
                   
@@ -295,14 +326,49 @@ const renderItem = ({ item }) => (
                 </TouchableOpacity>
           </View>
 
+                {shopId === '' ? null : (
+
+                  <Picker
+                  selectedValue={selectedCategory}
+                  onValueChange={(itemValue) =>
+                    setSelectedCategory(itemValue)
+                  }
+                  style={styles.Picker}
+                  >
+                  <Picker.Item label="[Brak przypisania]" value="" />
+                  {categoryData.map((cat, id) => {
+                    return (
+                      <Picker.Item label={cat.name} key={cat.id.toString()} value={cat.id.toString()} />
+
+                    );
+
+                  })}
+
+                  </Picker>
+
+                )}
+
+
       {isLoading ? <ActivityIndicator/> : (
             <SectionList
-            sections={data}
-            keyExtractor={item => item.id.toString()}
+            sections={productData}
+            keyExtractor={(item, index) => item.id.toString()}
             renderItem={renderItem}
-            renderSectionHeader={({ section: { title } }) => (
-              <Text>{title}</Text>
-            )}
+            renderSectionHeader={
+                  ({ section: { data, title } }) => (
+                    data.length > 0 ? 
+              <Text style={styles.sectionTitle}>{title}</Text>
+              :null
+              )
+            }
+            refreshControl={
+              <RefreshControl
+                enabled={true}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
+            
           />
 
       )} 
@@ -337,12 +403,22 @@ const styles = StyleSheet.create({
   },
   item: {
     flexDirection:'row',
-    backgroundColor: '#e6e6ff',
-    padding: 20,
+    backgroundColor: '#ffcccc',
+    padding: 10,
     marginVertical: 4,
     borderRadius: 10,
     borderWidth:2,
-    borderColor:"#E1E1FF"
+    borderColor:"red"
+  
+  },
+  itemChecked: {
+    flexDirection:'row',
+    backgroundColor: '#ccffcc',
+    padding: 10,
+    marginVertical: 4,
+    borderRadius: 10,
+    borderWidth:2,
+    borderColor:"green"
   
   },
   addInput: {
@@ -353,6 +429,7 @@ const styles = StyleSheet.create({
     borderWidth:1,
     borderColor:"#d9d9d9",
     height:55,
+    marginBottom:-15
    
 
   },
@@ -361,12 +438,10 @@ const styles = StyleSheet.create({
     marginLeft:5,
     position: 'absolute',
     right: 12,
-    bottom:15
+    bottom:0
   },
   ButtonDelete:{
-
-
-    
+    right:5
     
   },
   addPanel: {
@@ -377,5 +452,12 @@ const styles = StyleSheet.create({
     paddingRight:15,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  sectionTitle: {
+    fontWeight:'bold', 
+    paddingLeft:20,
+    paddingTop:15, 
+    fontSize:18
+
   },
 });

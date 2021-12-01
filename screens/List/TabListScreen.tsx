@@ -191,7 +191,9 @@ const DuplicateList = async (listId) => {
  //GRAFICZNY KOMPONENT LISTY
  const Item = ({ id,title, shop_id, share_key, productsCounted, productsAvalaible, created_at }) => (
   <TouchableOpacity
-  onPress={() => navigation.navigate('GetList', {listId: id.toString(), name:title})}
+  onPress={() => navigation.navigate('GetList', {listId: id.toString(),
+    shopId: typeof shop_id === 'number' ? shop_id.toString() : '',
+    name:title})}
   >
   <View style={styles.item}>
 
