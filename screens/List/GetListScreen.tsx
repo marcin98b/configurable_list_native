@@ -4,6 +4,7 @@ import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import {API_URL, getToken, setToken} from "../../api/env";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import Autocomplete from 'react-native-autocomplete-input';
 import { FontAwesome } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, SectionList } from 'react-native';
@@ -18,6 +19,7 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
   const [isLoading, setLoading] = useState(true);
   const [productData, setProductData] : any = useState([]);
   const [categoryData, setCategoryData] : any = useState([]);
+  const [customProductData, setCustomProductData] : any = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [productName, setName] = useState('');
 
@@ -87,12 +89,17 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
      }
      else // Single Object
      {
+       if(json === typeof(undefined)) setProductData(['']);
+       else
+       {
         let newJson = JSON.stringify(json);
         newJson = newJson.replace("name", "title");
         newJson = newJson.replace("products", "data");   
         newJson = "[" + newJson + "];";
         newJson = JSON.parse(newJson);
         setProductData(newJson);
+       }
+
      }
      //console.log( newJson );
 
@@ -126,9 +133,37 @@ const getCategories = async (shop_id) => {
    const response = await fetch(API_URL + '/shops/' +shop_id + '/categories', options);
    const json = await response.json();
    setCategoryData(json);
+   if(Array.isArray(json) && json.length) setSelectedCategory(json[0].id);
  } catch (error) {
    console.error(error);
  } 
+}
+
+const getCustomProducts = async () => {
+  try {
+
+  const token = await getToken();
+  const urlencoded = new URLSearchParams();  
+  const options = {
+    method: 'GET',
+    //body: urlencoded,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept':'application/json',
+      'Authorization': 'Bearer '+token
+      
+    },
+
+  }
+
+   const response = await fetch(API_URL + '/customProducts', options);
+   const json = await response.json();
+   setCustomProductData(json.map( s => s.name ));
+ } catch (error) {
+   console.error(error);
+ } finally {
+   setLoading(false);
+ }
 }
 
 
@@ -191,9 +226,10 @@ const AddProduct = async (listId, productName, shop_category_id) => {
      const response = await fetch(API_URL + '/lists/' + listId + '/products/' + product_id, options);
    } catch (error) {
      console.error(error);
-
-  
- }
+    }
+    finally {
+      getProducts(); //tickedState
+    }
 
 }
 
@@ -234,6 +270,7 @@ const DeleteProduct = async (listId, productId) => {
 
  useEffect(() => {
    shopId != '' ? getCategories(shopId): null;
+   getCustomProducts();
    getProducts();
  }, []);
 
@@ -297,8 +334,35 @@ const renderItem = ({ item }) => (
     <View style={styles.container}>
 
       <View style={styles.addPanel}>
+
+
+                {shopId === '' ? null : (
+                  <>
+                  <View style={[styles.Picker]}>
+                  <Picker
+                  style={{transform: [{scaleX: 0.85}, {scaleY: 0.85}],}}
+                  selectedValue={selectedCategory}
+                  onValueChange={(itemValue) =>
+                    setSelectedCategory(itemValue)
+                  }
+                  
+                  >
+                  {categoryData.map((cat, id) => {
+                    return (
+                      <Picker.Item label={cat.name} key={cat.id.toString()} value={cat.id.toString()} />
+
+                    );
+
+                  })}
+                      <Picker.Item label="[Brak]" value="" />
+                  </Picker>
+                  </View>
+                </>
+              )}
+
+
           <TextInput
-                  style={styles.addInput}
+                  style={shopId === '' ? styles.addInput : styles.addInputWithCategory}
                   placeholder="Dodaj produkt ..."
                   onChangeText={productName => setName(productName)}
                   defaultValue={productName} 
@@ -317,36 +381,19 @@ const renderItem = ({ item }) => (
                  // Keyboard.dismiss();
                   
                 }}   
-                style={styles.ButtonAdd}
+                style={shopId === '' ? styles.ButtonAdd : styles.ButtonAddWithCategory}
             
 
                 >
                 <FontAwesome name="plus-circle" size={55} color={productName ? "blue" : "gray"} />
 
                 </TouchableOpacity>
+
+
+
           </View>
 
-                {shopId === '' ? null : (
 
-                  <Picker
-                  selectedValue={selectedCategory}
-                  onValueChange={(itemValue) =>
-                    setSelectedCategory(itemValue)
-                  }
-                  style={styles.Picker}
-                  >
-                  <Picker.Item label="[Brak przypisania]" value="" />
-                  {categoryData.map((cat, id) => {
-                    return (
-                      <Picker.Item label={cat.name} key={cat.id.toString()} value={cat.id.toString()} />
-
-                    );
-
-                  })}
-
-                  </Picker>
-
-                )}
 
 
       {isLoading ? <ActivityIndicator/> : (
@@ -460,4 +507,42 @@ const styles = StyleSheet.create({
     fontSize:18
 
   },
+  addInputWithCategory: {
+    flex:4,
+    backgroundColor: "#FAFAFA",
+    paddingLeft:15,
+    borderBottomRightRadius:20,
+    borderTopRightRadius:20,
+    borderWidth:1,
+    borderLeftWidth:0,
+    borderColor:"#d9d9d9",
+    height:55,
+    marginBottom:-15,
+    zIndex:1
+
+   
+
+  },
+  ButtonAddWithCategory: {
+
+    marginLeft:5,
+    position: 'absolute',
+    right: 12,
+    bottom:0,
+    zIndex:2
+  },
+  Picker: {
+    flex:3,
+    backgroundColor: "#FAFAFA",
+    paddingTop:15,
+    borderBottomLeftRadius:20,
+    borderTopLeftRadius:20,
+    borderWidth:1,
+    borderColor:"#d9d9d9",
+    height:55,
+    marginBottom:-15
+    
+  
+  },
+
 });
