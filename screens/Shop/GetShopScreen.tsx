@@ -6,6 +6,7 @@ import { RootTabScreenProps } from '../../types';
 import {API_URL, getToken, setToken} from "../../api/env";
 import { FontAwesome } from '@expo/vector-icons';
 import {Keyboard} from 'react-native'
+import { HeaderBackButton } from '@react-navigation/elements';
 import { showMessage, hideMessage } from "react-native-flash-message";
 import moment from "moment";
 import 'moment/locale/pl';
@@ -166,6 +167,20 @@ const DuplicateList = async (listId) => {
 
  useEffect(() => {
    getLists(shopId);
+
+   navigation.setOptions({
+    headerLeft: () => (
+
+      <HeaderBackButton
+        style={{marginLeft:-4,marginRight:30}}
+      onPress={() => {
+        navigation.replace('Root', {screen:"TabShop"});
+      }}
+    />
+
+    )
+  });
+
  }, []);
 
 
@@ -173,7 +188,10 @@ const DuplicateList = async (listId) => {
  //GRAFICZNY KOMPONENT LISTY
  const Item = ({ id,title, shop_id, share_key, productsCounted, productsAvalaible, created_at }) => (
   <TouchableOpacity
-  onPress={() => navigation.navigate('GetList', {listId: id.toString(), name:title})}
+  onPress={() => navigation.navigate('GetList', {
+    listId: id.toString(), 
+    shopId: typeof shop_id === 'number' ? shop_id.toString() : '',
+    name:title})}
   >
   <View style={styles.item}>
 

@@ -68,7 +68,7 @@ if(name && login && password && password_confirmation && (password == password_c
       />
 
 
-     <Text >E-mail:</Text>
+     <Text  style={{paddingTop: 15}} >E-mail:</Text>
       <TextInput
         style={styles.TextInput}
         placeholder="Podaj swój e-mail"

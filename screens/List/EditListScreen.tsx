@@ -138,7 +138,7 @@ const EditList = async (list_id) => {
 
     {isLoading ? (
 
-      <Text>Ładowanie</Text>
+      <ActivityIndicator/>
 
     ) : (
 
@@ -153,6 +153,9 @@ const EditList = async (list_id) => {
 
         <Text style={{paddingTop: 15}} >Sklep:</Text>
 
+        <View style={{    
+          borderWidth:1,
+          borderColor:"#d9d9d9",}}>
         <Picker
           selectedValue={selectedShop}
           onValueChange={(itemValue) =>
@@ -170,7 +173,8 @@ const EditList = async (list_id) => {
           })}
 
         </Picker>
-        
+        </View>
+
         <View style = {styles.ShareView}>
             <Text  style={{paddingTop: 5, }} >Udostępnij: </Text>
                 <BouncyCheckbox

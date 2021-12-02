@@ -4,10 +4,10 @@ import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import {API_URL, getToken, setToken} from "../../api/env";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-//import Autocomplete from 'react-native-autocomplete-input';
 import { FontAwesome } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, SectionList, FlatList } from 'react-native';
+import { HeaderBackButton } from '@react-navigation/elements';
 import { showMessage, hideMessage } from "react-native-flash-message";
 import {Picker} from '@react-native-picker/picker';
 import _ from 'lodash';
@@ -163,19 +163,8 @@ const getCustomProducts = async () => {
    console.error(error);
  } finally {
 
-    navigation.setOptions({
-      
-      headerRight: () => (
-        <TouchableOpacity
-        style={{paddingTop:5}}
-        onPress={() => setModalVisible(true)}
-      >
-        <FontAwesome name="archive" size={32} color="#ff9900"/>
-      </TouchableOpacity>
-      ),
-    });
 
-   setLoading(false);
+
  }
 }
 
@@ -211,7 +200,6 @@ const AddProduct = async (listId, productName, shop_category_id) => {
     type:"success",
     icon:"success"
    });
-   setLoading(false);
  }
 }
 
@@ -275,7 +263,6 @@ const DeleteProduct = async (listId, productId) => {
     type:"info",
     icon:"success"
    });
-   setLoading(false);
  }
 }
 
@@ -286,6 +273,30 @@ const DeleteProduct = async (listId, productId) => {
    shopId != '' ? getCategories(shopId): null;
    getCustomProducts();
    getProducts();
+
+   navigation.setOptions({
+      
+    headerRight: () => (
+      <TouchableOpacity
+      style={{paddingTop:5}}
+      onPress={() => setModalVisible(true)}
+    >
+      <FontAwesome name="archive" size={32} color="#ff9900"/>
+    </TouchableOpacity>
+    ),
+    headerLeft: () => (
+
+      <HeaderBackButton
+        style={{marginLeft:-4,marginRight:30}}
+      onPress={() => {
+        navigation.replace('Root', {screen:"TabList"});
+      }}
+    />
+
+    )
+  });
+
+
  }, []);
 
 
@@ -347,13 +358,13 @@ const ModalItem = ({ title }) => (
 
 
   <TouchableOpacity
-    style={{borderBottomWidth:1, borderColor:'gray', width:120, padding:10}}
+    style={{borderBottomWidth:1, borderColor:'gray', width:"100%", padding:10}}
     onPress={() => {
       AddProduct(listId, title, selectedCategory);
       setModalVisible(false);
     }}
   >
-      <Text style={{textAlign:'center', fontSize:18, fontWeight:'bold',}}>★ {title}</Text>
+      <Text style={{textAlign:'center', fontSize:18, fontWeight:'bold',}}>{title}</Text>
   </TouchableOpacity>
 
 );
@@ -386,7 +397,7 @@ const renderModalItems = ({ item }) => (
                         style={{position:'absolute', right:'5%', top:'5%'}}
                         onPress={() => setModalVisible(!modalVisible)}
                       >
-                          <FontAwesome name="close" size={38} color='gray' />
+                          <FontAwesome name="close" size={38} color='black' />
                       </TouchableOpacity>
 
                       <FlatList
@@ -455,7 +466,7 @@ const renderModalItems = ({ item }) => (
             
 
                 >
-                <FontAwesome name="plus-circle" size={55} color={productName ? "blue" : "gray"} />
+                <FontAwesome name="plus-circle" size={55} color={productName ? "green" : "gray"} />
 
                 </TouchableOpacity>
 

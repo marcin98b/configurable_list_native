@@ -17,21 +17,21 @@ export default function TabListScreen({ navigation }: RootTabScreenProps<'TabLis
   const [listName, setName] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  const LogOut = async () => {
+//   const LogOut = async () => {
 
-  try {
-    await AsyncStorage.removeItem('@token').then(
-      res =>
-      {
-        navigation.replace('Login');
-      }
-    );
+//   try {
+//     await AsyncStorage.removeItem('@token').then(
+//       res =>
+//       {
+//         navigation.replace('Login');
+//       }
+//     );
 
-  }
-  catch(exception) {
-    return false;
-}
-  }
+//   }
+//   catch(exception) {
+//     return false;
+// }
+//   }
 
 
 

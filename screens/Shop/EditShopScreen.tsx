@@ -226,7 +226,7 @@ type Item = {
 
 };
 
-const renderItem = ({ item, drag, isActive }: RenderItemParams<Item>) => {
+const renderItem = ({ item, drag, isActive }) => {
   return (
     <ScaleDecorator>
       <TouchableOpacity
@@ -268,7 +268,7 @@ const renderItem = ({ item, drag, isActive }: RenderItemParams<Item>) => {
 
     {isLoading ? (
 
-      <Text>Ładowanie</Text>
+      <ActivityIndicator/>
 
     ) : (
 

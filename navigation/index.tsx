@@ -9,8 +9,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import * as React from 'react';
-import { ColorSchemeName, Pressable, TouchableOpacity, Text } from 'react-native';
-
+import { ColorSchemeName, Pressable, TouchableOpacity, Text, Touchable } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
@@ -64,19 +63,43 @@ function RootNavigator() {
 
 
   return (
-    <Stack.Navigator>
-     <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
-     <Stack.Screen name="Register" options={{title: 'Rejestracja'}} component={RegisterScreen} />  
-     <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-     <Stack.Screen name="GetList" options={({ route }) => ({ title: 'Lista: "'+route.params.name+'"' })} component={GetListScreen} />
-     <Stack.Screen name="EditList" options={({ route }) => ({ title: 'Edycja listy: "'+route.params.name+'"' })} component={EditListScreen} />  
-     <Stack.Screen name="GetShop" options={({ route }) => ({ title: 'Sklep: "'+route.params.name+'"' })} component={GetShopScreen} /> 
-     <Stack.Screen name="EditShop" options={({ route }) => ({ title: 'Edycja sklepu: "'+route.params.name+'"' })} component={EditShopScreen} />     
-     <Stack.Screen name="GetCustomProduct" options={({ route }) => ({ title: 'Produkt: ' })} component={GetCustomProductScreen} />     
-     <Stack.Screen name="EditCustomProduct" options={({ route }) => ({ title: 'Edycja produktu: "'+route.params.name+'"' })} component={EditCustomProductScreen} />    
-    <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+  <Stack.Navigator>
+    
+        {/* Auth  */}
+        <Stack.Group>
+            <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
+            <Stack.Screen name="Register" options={{title: 'Rejestracja'}} component={RegisterScreen} />  
+        </Stack.Group>
+    
+      {/*Bottom Tab Navigator - Lists, Shops, CustomProducts index*/}
+        <Stack.Group>
+           <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+        </Stack.Group>
 
-    </Stack.Navigator>
+      {/* List Modals */}
+        <Stack.Group>
+          <Stack.Screen name="GetList" options={({ route }) => ({ title: 'Lista: "'+route.params.name+'"' })} component={GetListScreen} />
+          <Stack.Screen name="EditList" options={({ route }) => ({ title: 'Edycja listy: "'+route.params.name+'"' })} component={EditListScreen} />  
+        </Stack.Group>
+
+      {/* Shop Modals */}
+      <Stack.Group>      
+         <Stack.Screen name="GetShop" options={({ route }) => ({ title: 'Sklep: "'+route.params.name+'"' })} component={GetShopScreen} /> 
+         <Stack.Screen name="EditShop" options={({ route }) => ({ title: 'Edycja sklepu: "'+route.params.name+'"' })} component={EditShopScreen} />    
+      </Stack.Group>
+
+      {/* Custom Products Modals */}
+      <Stack.Group>            
+        <Stack.Screen name="GetCustomProduct" options={({ route }) => ({ title: 'Produkt: ' })} component={GetCustomProductScreen} />     
+        <Stack.Screen name="EditCustomProduct" options={({ route }) => ({ title: 'Edycja produktu: "'+route.params.name+'"' })} component={EditCustomProductScreen} />    
+      </Stack.Group>        
+
+      {/* ETC */}
+      <Stack.Group>        
+        <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+      </Stack.Group> 
+
+  </Stack.Navigator>
   );
 }
 
@@ -104,20 +127,6 @@ function BottomTabNavigator() {
         options={({ navigation }: RootTabScreenProps<'TabList'>) => ({
           title: 'Twoje Listy',
           tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
-          // headerRight: () => (
-          //   <Pressable
-          //     onPress={() => navigation.navigate('TabShop')}
-          //     style={({ pressed }) => ({
-          //       opacity: pressed ? 0.5 : 1,
-          //     })}>
-          //     <FontAwesome
-          //       name="info-circle"
-          //       size={25}
-          //       color={Colors[colorScheme].text}
-          //       style={{ marginRight: 15 }}
-          //     />
-          //   </Pressable>
-          // ),
         })}
       />
       <BottomTab.Screen
@@ -139,39 +148,6 @@ function BottomTabNavigator() {
     </BottomTab.Navigator>
   );
 }
-
-
-// const Drawer = createDrawerNavigator();
-// function DrawerNavigator() {
-
-//   return (
-
-//       <Drawer.Navigator initialRouteName="Root">
-//       {getToken() == null ? (
-//         <>
-//      <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
-//      <Stack.Screen name="Register" options={{title: 'Rejestracja'}} component={RegisterScreen} />  
-//         </>
-//       ) : (
-//         <>
-//         <Drawer.Screen name="Root" component={RootNavigator} />
-//         <Drawer.Screen name="Notifications" component={BottomTabNavigator} />
-//         </>
-//       )}
-
-
-
-      
-//       </Drawer.Navigator>
-
-
-//   );
-
-
-
-// }
-
-
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/

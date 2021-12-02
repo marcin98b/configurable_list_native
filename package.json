@@ -35,7 +35,6 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
-    "react-native-autocomplete-input": "^5.0.2",
     "react-native-bouncy-checkbox": "^2.1.7",
     "react-native-draggable-flatlist": "^3.0.2",
     "react-native-flash-message": "^0.2.0",

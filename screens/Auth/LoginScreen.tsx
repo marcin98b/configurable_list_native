@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
 
   TextInput: {
 
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#FAFAFA",
     width: "90%",
     borderRadius:5,
     borderWidth:1,
