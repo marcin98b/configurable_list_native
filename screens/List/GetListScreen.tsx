@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { StyleSheet, TouchableOpacity, TextInput, RefreshControl, Keyboard, Alert, Animated, Touchable } from 'react-native';
+import { StyleSheet, TouchableOpacity, TextInput, RefreshControl, Modal, Button, Touchable, PlatformColor} from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import {API_URL, getToken, setToken} from "../../api/env";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import Autocomplete from 'react-native-autocomplete-input';
+//import Autocomplete from 'react-native-autocomplete-input';
 import { FontAwesome } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, SectionList } from 'react-native';
+import { ActivityIndicator, SectionList, FlatList } from 'react-native';
 import { showMessage, hideMessage } from "react-native-flash-message";
 import {Picker} from '@react-native-picker/picker';
 import _ from 'lodash';
@@ -22,7 +22,7 @@ export default function GetListScreen({ route, navigation }: RootTabScreenProps<
   const [customProductData, setCustomProductData] : any = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [productName, setName] = useState('');
-
+  const [modalVisible, setModalVisible] = useState(false);
 
 //Odswiezanie produktow
   const wait = (timeout) => {
@@ -157,11 +157,24 @@ const getCustomProducts = async () => {
   }
 
    const response = await fetch(API_URL + '/customProducts', options);
-   const json = await response.json();
-   setCustomProductData(json.map( s => s.name ));
+   const json = await response.json().then(response => setCustomProductData(response))
+   //setCustomProductData(json);
  } catch (error) {
    console.error(error);
  } finally {
+
+    navigation.setOptions({
+      
+      headerRight: () => (
+        <TouchableOpacity
+        style={{paddingTop:5}}
+        onPress={() => setModalVisible(true)}
+      >
+        <FontAwesome name="archive" size={32} color="#ff9900"/>
+      </TouchableOpacity>
+      ),
+    });
+
    setLoading(false);
  }
 }
@@ -269,6 +282,7 @@ const DeleteProduct = async (listId, productId) => {
 
 
  useEffect(() => {
+
    shopId != '' ? getCategories(shopId): null;
    getCustomProducts();
    getProducts();
@@ -320,6 +334,7 @@ const DeleteProduct = async (listId, productId) => {
 
 );
 
+
 const renderItem = ({ item }) => (
   <Item title={item.name}
         id={item.id} 
@@ -328,10 +343,64 @@ const renderItem = ({ item }) => (
   />
 );
 
+const ModalItem = ({ title }) => (
+
+
+  <TouchableOpacity
+    style={{borderBottomWidth:1, borderColor:'gray', width:120, padding:10}}
+    onPress={() => {
+      AddProduct(listId, title, selectedCategory);
+      setModalVisible(false);
+    }}
+  >
+      <Text style={{textAlign:'center', fontSize:18, fontWeight:'bold',}}>★ {title}</Text>
+  </TouchableOpacity>
+
+);
+
+
+
+const renderModalItems = ({ item }) => (
+  <ModalItem title={item.name}/>
+);
+
 
   return (
 
     <View style={styles.container}>
+
+
+    {/* Nstd przedmioty */}
+      <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+      >
+                  <View style={styles.viewModal}>
+
+                      <Text style={{fontSize:18}}>
+                        Dodaj swój produkt:
+                      </Text>
+                      
+                      <TouchableOpacity
+                        style={{position:'absolute', right:'5%', top:'5%'}}
+                        onPress={() => setModalVisible(!modalVisible)}
+                      >
+                          <FontAwesome name="close" size={38} color='gray' />
+                      </TouchableOpacity>
+
+                      <FlatList
+                        data={customProductData}
+                        renderItem={renderModalItems}
+                        keyExtractor={item => item.id.toString()}
+                        ListEmptyComponent={<Text style={{paddingTop:10, textAlign:'center'}}>Nie posiadasz żadnych przedmiotów własnych. Dodaj je w zakładce "Twoje przedmioty".</Text>}
+
+                      />
+                </View>
+
+      </Modal>
+
+
 
       <View style={styles.addPanel}>
 
@@ -340,6 +409,7 @@ const renderItem = ({ item }) => (
                   <>
                   <View style={[styles.Picker]}>
                   <Picker
+                  prompt='Wybierz kategorię przedmiotów:'
                   style={{transform: [{scaleX: 0.85}, {scaleY: 0.85}],}}
                   selectedValue={selectedCategory}
                   onValueChange={(itemValue) =>
@@ -543,6 +613,19 @@ const styles = StyleSheet.create({
     marginBottom:-15
     
   
+  },
+  viewModal: {
+    marginTop:'25%',
+    marginLeft:'10%',
+    marginRight:'10%',
+    width:"80%",
+    backgroundColor: "#ffffcc",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5
   },
 
 });

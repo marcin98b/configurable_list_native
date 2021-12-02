@@ -72,7 +72,7 @@ function RootNavigator() {
      <Stack.Screen name="EditList" options={({ route }) => ({ title: 'Edycja listy: "'+route.params.name+'"' })} component={EditListScreen} />  
      <Stack.Screen name="GetShop" options={({ route }) => ({ title: 'Sklep: "'+route.params.name+'"' })} component={GetShopScreen} /> 
      <Stack.Screen name="EditShop" options={({ route }) => ({ title: 'Edycja sklepu: "'+route.params.name+'"' })} component={EditShopScreen} />     
-     <Stack.Screen name="GetCustomProduct" options={({ route }) => ({ title: 'Produkt: "Placeholder"' })} component={GetCustomProductScreen} />     
+     <Stack.Screen name="GetCustomProduct" options={({ route }) => ({ title: 'Produkt: ' })} component={GetCustomProductScreen} />     
      <Stack.Screen name="EditCustomProduct" options={({ route }) => ({ title: 'Edycja produktu: "'+route.params.name+'"' })} component={EditCustomProductScreen} />    
     <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
 
