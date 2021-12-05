@@ -58,6 +58,7 @@ if(login && password) {
 
      <Text >E-mail:</Text>
       <TextInput
+        autoCompleteType="email"
         style={styles.TextInput}
         placeholder="Podaj swój e-mail"
         onChangeText={login => setLogin(login)}
@@ -66,6 +67,7 @@ if(login && password) {
 
       <Text style={{paddingTop: 15}} >Hasło:</Text>
       <TextInput
+        autoCompleteType="password"
         style={styles.TextInput}
         placeholder="Podaj swoje hasło"
         onChangeText={password => setPassword(password)}
