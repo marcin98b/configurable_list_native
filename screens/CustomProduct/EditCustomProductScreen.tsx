@@ -228,7 +228,7 @@ const UploadPhoto = async (result) => {
         <TextInput
           multiline
           numberOfLines={10}
-          style={[styles.TextInput, {height:80, textAlignVertical: "top" }]}
+          style={[styles.TextInput, {height:'30%', textAlignVertical: "top" }]}
           placeholder="Opisz swój produkt ..."
           onChangeText={description => setProductDescription(description)}
           value={productDescription}  
