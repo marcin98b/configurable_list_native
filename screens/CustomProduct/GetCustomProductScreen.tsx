@@ -92,7 +92,7 @@ const handleBarCodeScanned = ({ data }) => {
   getEANdata(data);
   
   //sprawdzenie czy odpowiedź nie jest pusta lub nie posiada błędu
-  if(typeof eanData === undefined && !eanFetchError) 
+  if(typeof eanData != undefined && !eanData.message && !eanFetchError) 
   {
     alert('Produkt został znaleziony w bazie. Uzupełniono tytuł oraz opis produktu.')
 
