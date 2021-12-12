@@ -81,7 +81,7 @@ const getEANdata = async (ean) => {
  })
 
 }
-
+// -------------
 
 const handleBarCodeScanned = ({ data }) => {
 
@@ -92,7 +92,7 @@ const handleBarCodeScanned = ({ data }) => {
   getEANdata(data);
   
   //sprawdzenie czy odpowiedź nie jest pusta lub nie posiada błędu
-  if(eanData !== null && !eanFetchError) 
+  if(typeof eanData === undefined && !eanFetchError) 
   {
     alert('Produkt został znaleziony w bazie. Uzupełniono tytuł oraz opis produktu.')
 
@@ -183,13 +183,11 @@ useEffect(() => {
 
                       {/* *integracyjne */}
                         <View
-                              style={{position:'absolute', right:'37%', bottom:'3%', alignItems:'center',}}
+                              style={styles.eanButton}
                           >
                               <TouchableOpacity
                         onPress={() => {checkPermissions && setModalVisible(true) }  }
-                              
-
-                                    
+         
                             >
                                 <FontAwesome style={{left:40}} name="barcode" size={42} color="black" />
                                 <Text style={{fontSize:10}}>Pobierz dane o produkcie</Text>
@@ -314,6 +312,9 @@ const styles = StyleSheet.create({
     width:'90%', 
     height:'30%'
 
+  },
+  eanButton: {
+    position:'absolute', right:'37%', bottom:'3%', alignItems:'center',
   }
 
   // ------------
