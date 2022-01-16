@@ -6,7 +6,7 @@ import { Text, View } from '../../components/Themed';
 import { RootTabScreenProps } from '../../types';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import {API_URL, getToken} from "../../api/env";
+import {API_URL, setToken} from "../../api/env";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
@@ -23,28 +23,28 @@ const CheckCredentials = () => {
 
 
 if(login && password) { 
-    const response = {
+  
+  //definicja struktury żądania - pola w ciele (body) żądania
+  const request = {
         "email": login,
-        "password": password,
-        "token":''
+        "password": password
     }
-
-    axios.post(API_URL + '/login', response)
+  
+  //wykonanie żądania post zasobu "listak.pl/api/login" - w ciele przesłane zostaną 
+  //pola email oraz password (request)
+    axios.post(API_URL + '/login', request)
     .then(
-        async response => {
-            await AsyncStorage.setItem("@token", response.data.token)
+        async response => { //jesli poprawna odpowiedz serwera ustaw token
+            await setToken(response.data.token)
             .then(
-                response => {
+                response => { //nastepnie przenieś użytkownika do aplikacji
                     navigation.replace('Root');
                 }
             );
-        },
+        }, //w przypadku zlych danych - alert
         err => {
             alert("Błędne dane logowania!");
         }
-
-
-
     )
 
 

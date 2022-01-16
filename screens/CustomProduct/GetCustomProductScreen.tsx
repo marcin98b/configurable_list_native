@@ -1,35 +1,46 @@
+//wczytanie wykorzystanych komponentów
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Modal, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text, View } from '../../components/Themed';
 import { FontAwesome } from '@expo/vector-icons';
-import { RootTabScreenProps } from '../../types';
-import {API_URL, getToken, setToken} from "../../api/env";
-import { useEffect, useState } from 'react';
-
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import {API_URL, getToken} from "../../api/env";
 
-
-export default function GetCustomProductScreen({ route, navigation }: RootTabScreenProps<'TabList'>) {
+//funkcja glowna ekranu
+export default function GetCustomProductScreen({ route, navigation }) {
  
+  //definicja zmiennej produktu z parametrów nawigacji
   const {productId}:any  = route.params;
+
+  //definicja stanów i ich setterów (pobieranie danych z API ListaK)
+  //productData - stan przechowujący pobrany produkt z zasobu
+  //isLoading - stan definiujący, czy produkt został pobrany z API
+
   const [productData, setData] : any = useState([]);
   const [isLoading, setLoading] = useState(true);
 
-  // *integracyjne
+  //definicja stanów i ich setterów (pobieranie danych z API Barcode Lookup)
+  // modalVisible - stan sluzacy do otwierania okna skanera
+  // hasPermission - stan przechowujacy uprawnienia do kamery
+  // eanData - stan przechowujacy pobrane dane o produkcie z kodu EAN
+  // eanFetchError - stan przechowujacy blad polaczenia z API Barcode Lookup
+
   const [modalVisible, setModalVisible] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [eanData, setEanData]:any = useState(null);
   const [eanFetchError, setEanFetchError]:any = useState(null);
   // ------------------
 
+  //komponent fukcyjny pobierający dane o produkcie niest. z API ListaK
+  //zasób: api/customProducts/{id} [metoda: GET]
   const getCustomProduct = async (custom_product_id) => {
     try {
-
+    //pobranie tokenu uzytkownika oraz ustawienie naglowkow zapytania
     const token = await getToken();
-    const urlencoded = new URLSearchParams();  
     const options = {
       method: 'GET',
-      //body: urlencoded,
+      //body: {},
       headers: {
         'Content-Type': 'application/json',
         'Accept':'application/json',
@@ -38,19 +49,23 @@ export default function GetCustomProductScreen({ route, navigation }: RootTabScr
       },
 
   }
-
+  //pobranie odpowiedzi zapytania i przechowanie go w stanie productData
    const response = await fetch(API_URL + '/customProducts/'+custom_product_id, options);
    const json = await response.json();
    setData(json);
+
+   //ustawienie naglowka nawigacji o pobrany produkt
    navigation.setOptions({ title: 'Produkt: "'+json.name+'"' });
+
  } catch (error) {
    console.error(error);
  } finally {
+   //ladowanie produktu zakonczone
    setLoading(false);
  }
 }
 
-//*integracyjne
+//sprawdzenie uprawnien skanera
 const checkPermissions = async () => {
   const {granted} = await BarCodeScanner.getPermissionsAsync();
   if(granted) setHasPermission(true)
@@ -61,9 +76,11 @@ const checkPermissions = async () => {
   }
 }
 
+// pobranie danych z API "Barcode Lookup" o produkcie
+// na podstawie zeskanowego kodu kreskowego
 const getEANdata = async (ean) => {
   
-  // pobranie danych z API "Barcode Lookup"
+
   const url = 'https://barcode-lookup.p.rapidapi.com/v3/products?barcode=' + ean;
   const options = {
     method: 'GET',
@@ -74,30 +91,37 @@ const getEANdata = async (ean) => {
   }
  const response = await fetch(url, options)
  .then((response) => response.json())
- .then((responseJson) => {setEanData(responseJson); console.log(responseJson)}) //produkt znaleziony
+ .then((responseJson) => {
+   //produkt znaleziony
+   setEanData(responseJson); 
+   console.log(responseJson)
+  }) 
  .catch((error) => {
-  console.log(error);  //produkt nieznaleziony
+  //produkt nieznaleziony
+  console.log(error);  
   setEanFetchError(error);
  })
 
 }
-// -------------
 
+//komponent funkcyjny definiujące działania, jakie wykona aplikacja
+//po pomyślnym zeskanowaniu kodu kreskowego
 const handleBarCodeScanned = ({ data }) => {
 
-  //ukrycie aparatu
+  //ukrycie okna skanera
   setModalVisible(false);
 
-  //Pobranie produktu
+  //Pobranie produktu z API
   getEANdata(data);
   
   //sprawdzenie czy odpowiedź nie jest pusta lub nie posiada błędu
   if( (typeof eanData === 'object' && eanData !== null) && 
       !eanFetchError  && !eanData.message?1:0) 
   {
+    //wyswietlenie komunikatu o pomyslnym znalezieniu produktu w bazie
     alert('Produkt został znaleziony w bazie. Uzupełniono tytuł oraz opis produktu.')
 
-    //pobranie danych o produkcie
+    //pobranie danych o produkcie z formatu JSON
     let title = eanData.products[0].title;
     let desc = eanData.products[0].description;
     
@@ -113,23 +137,24 @@ const handleBarCodeScanned = ({ data }) => {
   else alert('Produkt nie znajduje się w bazie!');
 };
 
-//--------------
-
+//hook efektu pobierajacy dane o produkcie z API ListaK
+//przed załadowaniem ekranu
 useEffect(() => {
   getCustomProduct(productId);
   
 }, []);
   
 
-
+//tutaj zwracany jest widok aplikacji
   return (
 
     <View style={styles.container}>
 
+    {/* wyświetlenie danych na ekranie, jeśli zostaną pobrane z API */}
     {isLoading ? <ActivityIndicator/> : (
 
           <>
-        {/* Integracyjne */}
+        {/* okno skanera kodów kreskowych */}
         <Modal
                 animationType="slide"
                 transparent={true}
@@ -161,6 +186,7 @@ useEffect(() => {
           </Modal>
         {/* ------------------- */}
 
+        {/* nagłówek karty produktu wraz z obrazkiem */}
           <View style={styles.productHeader}>
                           <Text style={styles.title}>{productData.name}</Text>
                           <Image
@@ -171,7 +197,7 @@ useEffect(() => {
                                   : require('../../assets/images/Blank.png')} 
                           />
                       </View>
-                      
+          {/* opis produktu */}                    
                       <View>
                           <Text style={styles.titleDesc}>Opis:</Text>
                           <Text style={styles.productDescription}>
@@ -182,7 +208,7 @@ useEffect(() => {
 
                       </View>
 
-                      {/* *integracyjne */}
+                      {/* przycisk pobierający dane z API Barcode Lookup */}
                         <View
                               style={styles.eanButton}
                           >
@@ -215,7 +241,7 @@ useEffect(() => {
 
   
 }
-
+// style ekranu
 const styles = StyleSheet.create({
   container: {
     flex: 1,
